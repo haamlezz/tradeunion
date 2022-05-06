@@ -1,0 +1,36 @@
+@import url(//fonts.googleapis.com/earlyaccess/souliyo.css);
+
+@font-face {
+    font-family: 'Souliyo', sans-serif;
+    src: url(../webfonts/Souliyo-Regular.ttf);
+}
+
+*, body {
+    font-family: 'Souliyo', sans-serif;
+}
+
+nav{
+    background-color: rgb(0, 0, 0, 0.8 );
+}
+
+.dropdown:hover>.dropdown-menu{
+    display: block;
+}
+
+.nav-link:hover{
+    border-radius: 6px;
+    background-color:#e3f2fd;
+    color:#333333;
+}
+
+.navbar-dark .navbar-nav .nav-link.active, .navbar-dark .navbar-nav .show>.nav-link {
+    background-color:#e3f2fd;
+    color:#333333;
+    border-radius: 6px;
+}
+
+.dropdown-menu-end{
+    right: 0;
+    left: auto;
+}
+
