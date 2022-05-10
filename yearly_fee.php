@@ -1,6 +1,6 @@
 <?php
 session_start();
-$current_page = 'college';
+$current_page = 'yearly_fee';
 require_once __DIR__ . '/include/define.php';
 require_once __DIR__ . '/include/function.php';
 require_once __DIR__ . '/include/dbconfig.php';
@@ -12,21 +12,25 @@ require __DIR__ . '/menu.php';
 ?>
 
 <div class="container mt-3">
-    <h2>ຈັດການຂໍ້ມູນຈຸ</h2>
+    <h2>ຈັດການຂໍ້ມູນຄ່າສະຕິປະຈຳປີ</h2>
 
     <div class="row">
         <div class="col-md-4" style="border-right:thin #333333 solid;">
             <form action="" method="post">
                 <div class="form-group mt-3">
-                    <label for="groupId">ລະຫັດ</label>
-                    <input readonly type="text" class="form-control" name="id" value="" id="groupId">
+                    <label for="feeid">ລະຫັດ</label>
+                    <input readonly type="text" class="form-control" name="feeid" value="" id="feeid">
                 </div>
                 <div class="form-group mt-3 mb-3">
-                    <label for="groupName">ຊື່ຈຸ</label>
-                    <input required type="text" name="groupName" id="groupName" class="form-control">
+                    <label for="year">ປີ</label>
+                    <input required value="" type="text" name="year" id="year" class="form-control" placeholder="ປ້ອນປີ">
+                </div>
+                <div class="form-group mt-3 mb-3">
+                    <label for="fee">ຄ່າສະຕິ</label>
+                    <input required value="" type="text" name="fee" id="fee" class="form-control" placeholder="ປ້ອນຄ່າສະຕິ">
                 </div>
                 <input type="hidden" name="do" value="add" id="doAction">
-                <button disabled="" id="btnAction" type="button" class="btn btn-primary" onclick="doProcess()">ບັນທຶກ</button>
+                <button id="btnAction" type="button" class="btn btn-primary" onclick="doProcess()">ບັນທຶກ</button>
                 <button id="btnCancel" type="button" class="btn btn-warning d-none" onclick="doCancel()">ຍົກເລີກ</button>
             </form>
         </div>
@@ -35,30 +39,25 @@ require __DIR__ . '/menu.php';
                 <thead>
                     <tr>
                         <th class="col-1">ລະຫັດ</th>
-                        <th class="col-4">ຊື່ຈຸ</th>
-                        <th class="col-3">ຈຳນວນສະມາຊິກ</th>
+                        <th class="col-4">ປີ</th>
+                        <th class="col-3">ຄ່າສະຕິ</th>
                         <th class="col-4">ໂຕເລືອກ</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php
-                    $sql = "SELECT groups.id, groups.group_name, (select count(*) from member where member.group_id = groups.id) as num_member from groups where col_id = " . $_SESSION['college_id'] . " ORDER BY groups.group_name;";
+                    $sql = "SELECT * FROM yearly_fee";
                     $rs = mysqli_query($con, $sql);
                     while ($row = $rs->fetch_assoc()) {
                         $str = '
                                 <tr>
                                     <td>' . $row['id'] . '</td>
-                                    <td>' . $row['group_name'];
-
-
+                                    <td>' . $row['year'];
                         $str .= '</td>
-                                    <td>' . $row['num_member'] . '</td>
+                                    <td>' . $row['fee'] . '</td>
                                     <td>
-                                        <button onclick="getMembers(' . $row['id'] . ')" type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                                            ສະແດງ
-                                        </button>
-                                        <a class="btn btn-success btn-sm" href="#" onclick="editGroup(' . $row['id'] . ',\'' . $row['group_name'] . '\')">ແກ້ໄຂ</a>
-                                        <a class="btn btn-danger btn-sm" href="#" onclick="deleteGroup(' . $row['id'] . ')">ລົບ</a>
+                                        <a class="btn btn-success btn-sm" href="#" onclick="editYearlyFee(' . $row['id'] . ',' . $row['year'] . ','.$row['fee'].')">ແກ້ໄຂ</a>
+                                        <a class="btn btn-danger btn-sm" href="#" onclick="deleteYearlyFee(' . $row['id'] . ')">ລົບ</a>
                                     </td>
                                 </tr>
                             ';
@@ -98,8 +97,8 @@ require __DIR__ . '/footer.php';
     $(document).ready(function() {
         $('#example').DataTable();
 
-        // /*ແຍກຈຸດຫຼັກພັນ ....*/
-        // $('#incentive').priceFormat({
+        /*ແຍກຈຸດຫຼັກພັນ ....*/
+        // $('#fee').priceFormat({
         //     prefix: '',
         //     suffix: ' ກີບ',
         //     thounsandsSeparator: ',',
@@ -107,42 +106,20 @@ require __DIR__ . '/footer.php';
         // });
     });
 
-    function getMembers(group_id) {
-
-        $.ajax({
-            url: "group_view.php",
-            method: "post",
-            data: {
-                group_id: group_id
-            },
-            success: function(data) {
-                $('#college_detail').html(data);
-                $('#exampleModal').modal("show");
-            }
-        });
-    }
-
-
-    $('#groupName').keyup(() => {
-        if ($('#groupName').val().length > 0) {
-            $('#btnAction').prop('disabled', false)
-        } else {
-            $('#btnAction').prop('disabled', true)
-        }
-    })
-
     function doProcess() {
         var doAction = document.getElementById("doAction").value;
-        var groupId = document.getElementById("groupId").value;
-        var groupName = document.getElementById("groupName").value;
+        var feeid = document.getElementById("feeid").value;
+        var year = document.getElementById("year").value;
+        var fee = document.getElementById("fee").value;
 
         $.ajax({
-            url: "group-process.php",
+            url: "yearly_fee_process.php",
             method: "post",
             data: {
-                groupId: groupId,
                 doAction: doAction,
-                groupName: groupName
+                feeid: feeid,
+                year: year,
+                fee: fee
             },
             success: function(response) {
                 console.log(response)
@@ -167,24 +144,23 @@ require __DIR__ . '/footer.php';
                         location.reload();
                     });
                 } else {
-                    location.reload();
+                    //location.reload();
                 }
 
             }
         });
     }
 
-    function editGroup(id, groupName) {
+    function editYearlyFee(id, year, fee) {
         document.getElementById("doAction").setAttribute("value", "edit");
         document.getElementById("btnAction").innerHTML = "ປັບປຸງ"
-        document.getElementById("groupId").setAttribute("value", id);
-        document.getElementById("groupName").setAttribute("value", groupName);
+        document.getElementById("feeid").setAttribute("value", id);
+        document.getElementById("year").setAttribute("value", year);
+        document.getElementById("fee").setAttribute("value", fee);
         document.getElementById("btnCancel").setAttribute("class", "btn btn-warning");
-        $('#btnAction').prop('disabled', false)
-
     }
 
-    function deleteGroup(id) {
+    function deleteYearlyFee(id) {
         Swal.fire({
             title: "ຕ້ອງການລືບແທ້ ຫຼື ບໍ່?",
             text: "ທ່ານຈະບໍ່ສາມາດກູ້ຂໍ້ມູນຄືນໄດ້!",

@@ -1,6 +1,6 @@
 <?php
 session_start();
-$current_page = 'activity';
+$current_page = 'college';
 require_once __DIR__.'/include/define.php';
 require_once __DIR__.'/include/function.php';
 require_once __DIR__.'/include/dbconfig.php';

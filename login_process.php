@@ -1,5 +1,6 @@
 <?php
 session_start();
+$current_page = "Login";
 require_once __DIR__ . '/include/define.php';
 require_once __DIR__ . '/include/function.php';
 require_once __DIR__ . '/include/dbconfig.php';
@@ -12,15 +13,14 @@ if ($_POST) {
 
     $username = filter_input(INPUT_POST, 'username');
 
-    $password = filter_input(INPUT_POST, 'password');
+    $password = $_POST['password'];
 
     $sql = "SELECT username, member.role, group_id, member.password FROM member WHERE username = ?";
     
     $rs = prepared_stm($con, $sql, [$username])->get_result();
-    
+
     $row = $rs->fetch_assoc();
-    print_r($row);
-    if ($rs->num_rows == 1 && password_verify($password, $row['password'])) {
+    if (password_verify($password, $row['password'])) {
         $_SESSION['login'] = true;
         $_SESSION['username'] = $username;
         $_SESSION['role'] = $row['role'];

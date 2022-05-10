@@ -1,6 +1,6 @@
 <?php
 session_start();
-$current_page = 'college';
+$current_page = 'activity';
 require_once __DIR__.'/include/define.php';
 require_once __DIR__.'/include/function.php';
 require_once __DIR__.'/include/dbconfig.php';
@@ -12,6 +12,7 @@ if (isMember()){
     restrictPage();
 }
 if($_POST){
-    $sql = "DELETE FROM activity WHERE id = ? AND col_id = ?";
-    $rs = prepared_stm($con, $sql, [$_POST['activity_id'], $_SESSION['college_id']]);
+        $sql = "DELETE FROM membership_fee WHERE id = ?";
+        $rs = prepared_stm($con, $sql, [$_POST['id']]);
+        echo $rs->affected_rows;
 }

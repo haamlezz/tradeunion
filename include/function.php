@@ -13,7 +13,9 @@ function prepared_stm($con, $sql, $params, $types=""){
     
     if($stm = $con->prepare($sql)){
         $stm->bind_param($types, ...$params);
+        echo $con->error;
         $stm->execute();
+        
         return $stm;
     }else{
         echo $con->error;
@@ -81,8 +83,13 @@ function isExisted($con, $col, $table, $id){
 
 }
 
-function restrictPage(){
-    echo '<div class="container"><div class="mt-3 alert alert-danger text-lg-center">ທ່ານບໍ່ມີສິດເຂົ້າໜ້ານີ້, <a href="index.php">ກັບໜ້າຫຼັກ</a></div></div>';
+function restrictPage($location=null){
+    if($location==null){
+        echo '<div class="container"><div class="mt-3 alert alert-danger text-lg-center">ທ່ານບໍ່ມີສິດເຂົ້າໜ້ານີ້, <a href="index.php">ກັບໜ້າຫຼັກ</a></div></div>';
+    }else{
+        echo '<div class="container"><div class="mt-3 alert alert-danger text-lg-center">ທ່ານບໍ່ມີສິດເຂົ້າໜ້ານີ້, <a href="'.$location.'.php">ກັບໜ້າຫຼັກ</a></div></div>';
+    }
+    
     require 'footer.php';
     exit();
 }
@@ -91,4 +98,61 @@ function notFoundPage(){
     echo '<div class="container"><div class="mt-3 alert alert-info text-lg-center">ບໍ່ພົບໜ້ານີ້, <a href="index.php">ກັບໜ້າຫຼັກ</a></div></div>';
     require 'footer.php';
     exit();
+}
+
+function noValidateField($value , $field=[]){
+    foreach($field as $f){
+        if($f == $value){
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
+function dataListProvince($id){
+    $provinces = [
+        'ຄຳມ່ວນ',
+        'ຈຳປາສັກ',
+        'ສາລະວັນ',
+        'ສະຫວັນນະເຂດ',
+        'ຊຽງຂວາງ',
+        'ໄຊຍະບູລີ',
+        'ໄຊສົມບູນ',
+        'ເຊກອງ',
+        'ບໍລິຄຳໄຊ',
+        'ບໍ່ແກ້ວ',
+        'ຜົ້ງສາລີ',
+        'ຫຼວງນໍ້າທາ',
+        'ຫຼວງພະບາງ',
+        'ວຽງຈັນ',
+        'ອັດຕະປື',
+        'ອຸດົມໄຊ',
+        'ຫົວພັນ',
+        'ນະຄອນຫຼວງວຽງຈັນ',
+    ];
+    echo '
+    <datalist id="'.$id.'">';
+        foreach($provinces as $p){
+            echo '
+                <option>'.$p.'</option>
+            ';
+        }
+    echo '</datalist>';
+}
+
+
+function listMemberAutoComplete($con,$id){
+    $sql = "SELECT CONCAT(member.firstname, ' ', member.lastname) AS fullname, member.mem_id AS id FROM member JOIN groups ON groups.id = member.group_id WHERE groups.col_id = ".$_SESSION['college_id'];
+
+    $rs = mysqli_query($con, $sql);
+    
+    echo '<datalist id="'.$id.'">';
+        while($row = mysqli_fetch_assoc($rs)){
+            echo '
+                <option value="'.$row['id'].'">'.$row['fullname'].'</option>
+            ';
+        }
+    echo '</datalist>';
 }

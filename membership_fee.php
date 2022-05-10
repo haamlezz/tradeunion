@@ -10,66 +10,40 @@ require_once __DIR__ . '/menu.php';
 ?>
 
 <div class="container mt-3">
-    <h2>ຈັດການຂໍ້ມູນສະມາຊິກ</h2>
+    <h2>ຈັດການຂໍ້ມູນການເສຍຄ່າສະຕິ</h2>
 
     <?php if (isAdmin() || isCommittee()) : ?>
         <div class="mt-3" style="margin-bottom: 30px;">
-            <a href="member_add.php" class="btn btn-primary">ເພີ່ມສະມາຊິກໃໝ່</a>
+            <a href="membership_fee_add.php" class="btn btn-primary">ເພີ່ມຂໍ້ມູນໃໝ່</a>
         </div>
     <?php endif; ?>
-
 
     <table id="example" class="table table-hover mt-5">
         <thead>
             <tr>
                 <th class="col-1">ລະຫັດ</th>
                 <th class="col-4">ຊື່-ນາມສະກຸນ</th>
-                <th class="col-1">ເພດ</th>
-                <th class="col-2">ສັງກັດ</th>
+                <th class="col-2">ວັນທີຊຳລະ</th>
+                <th class="col-2">ປະຈຳປີ</th>
                 <th class="col-3">ໂຕເລືອກ</th>
             </tr>
         </thead>
         <tbody>
             <?php
-            $sql = "SELECT mem_id, firstname, lastname, gender, username, role, (SELECT groups.group_name FROM groups WHERE groups.id = member.group_id) AS g_name FROM member JOIN groups ON groups.id = member.group_id WHERE groups.col_id = ". $_SESSION['college_id'].";";
-        
+            $sql = "SELECT membership_fee.id AS p_id, date_format(membership_fee.pay_date, '%d/%m/%Y') AS p_date, member.firstname, member.lastname, (SELECT yearly_fee.year FROM yearly_fee WHERE yearly_fee.id = membership_fee.fee_id) AS p_year FROM member JOIN membership_fee ON member.mem_id = membership_fee.mem_id JOIN groups ON member.group_id = groups.id WHERE groups.col_id = ". $_SESSION['college_id'] ;
             $rs = $con->query($sql);
             echo $con->error;
             while ( $row = $rs->fetch_assoc() ) {
-                echo '
-                    <tr>
-                        <td>' . $row['mem_id'] . '</td>
-                        <td>' 
-                        . $row['firstname'] . ' ' .$row['lastname']. 
-                        ' &nbsp; &nbsp; ';
-
-                        switch ($row['role']){
-                            case 1: echo '<span class="badge bg-primary">ຄະນະບໍລິຫານ</span>';
-                            break;
-                            case 2: echo '<span class="badge bg-warning">ຮາກຖານ</span>';
-                        }
-                echo   '</td>
-                        <td>' . $row['gender'] . '</td>
-                        <td>' . $row['g_name'] . '</td>
-                        <td>
-                            <button onclick="getMember(' . $row['mem_id'] . ')" type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                                ສະແດງ
-                            </button>';
-                
-                    echo '                
-                            <a href="member_add.php?member_id=' . $row['mem_id'] . '" class="btn btn-success btn-sm">ແກ້ໄຂ</a>
-                    ';
-                    if( $row['username']!=$_SESSION['username']){
-                        if($row['role'] != 1 || isAdmin()){
-                            echo '<a onclick="deleteMember(' . $row['mem_id'] . ')" href="#" class="btn btn-danger btn-sm">ລົບ</a>';
-                        }
-                    }
-                    
-
-                    //<a onclick="deleteMember(' . $row['mem_id'] . ')" href="#" class="btn btn-danger btn-sm">ລົບ</a>
-
-                echo '</td>
-                </tr>';
+               echo '<tr>';
+                echo '<td>'.$row['p_id'].'</td>';
+                echo '<td>'.$row['firstname'].' '.$row['lastname'].'</td>';
+                echo '<td>'.$row['p_date'].'</td>';
+                echo '<td>'.$row['p_year'].'</td>';
+                echo '<td>
+                <a class="btn btn-success btn-sm" href="membership_fee_edit.php?id='.$row['p_id'].'">ແກ້ໄຂ</a>
+                <a class="btn btn-danger btn-sm" href="#" onclick="deleteMembershipFee(' . $row['p_id'] . ')">ລົບ</a>
+            </td>';
+               echo '</tr>';
             }
             ?>
         </tbody>
@@ -129,7 +103,7 @@ require __DIR__ . '/footer.php';
         });
     }
 
-    function deleteMember(member_id) {
+    function deleteMembershipFee(id) {
 
         Swal.fire({
             title: "ຕ້ອງການລືບແທ້ ຫຼື ບໍ່?",
@@ -144,32 +118,27 @@ require __DIR__ . '/footer.php';
             if (willDelete.isConfirmed) {
                 console.log("delete")
                 $.ajax({
-                    url: "member_delete.php",
+                    url: "membership_fee_delete.php",
                     method: "post",
                     data: {
-                        member_id: member_id
+                        id: id
                     },
                     success: function(data) {
+                        console.log(data);
                         if(data == 1){
-                            Swal.fire("ບໍ່ສຳເລັດ", "ທ່ານບໍ່ສາມາດລຶບຂໍ້ມູນທ່ານເອງໄດ້", "success", {
-                                icon: "warning",
+                            Swal.fire("ສຳເລັດ", "ຂໍ້ມູນຖືກລຶບແລ້ວ", "success", {
                                 position: "top-center", 
                                 button: "ຕົກລົງ",
-                        });
-                    }else if(data == 2){
-                        Swal.fire("ບໍ່ສຳເລັດ", "ທ່ານບໍ່ສາມາດລຶບຂໍ້ມູນທ່ານເອງໄດ້", "success", {
-                                icon: "warning",
-                                position: "top-center", 
-                                button: "ຕົກລົງ",
+                        }).then(()=>{
+                            window.location.href = "membership_fee.php";
                         });
                     }else{
-                        Swal.fire("ສໍາເລັດ", "ຂໍ້ມູນຖືກລືບອອກຈາກຖານຂໍ້ມູນແລ້ວ", "success", {
-                            button: "ຕົກລົງ",
-                        }).then(()=>{
-                            location.reload();
+                        Swal.fire("ບໍ່ສຳເລັດ", "ທ່ານບໍ່ສາມາດລຶບຂໍ້ມູນທ່ານເອງໄດ້", "warning", {
+                                icon: "warning",
+                                position: "top-center", 
+                                button: "ຕົກລົງ",
                         });
                     }
-                        
                     }
                 });
             }

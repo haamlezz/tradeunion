@@ -21,7 +21,11 @@ if($_GET){
         if(!isOwner($_GET['college_id'])){    
             restrictPage();
         }
-    }   
+    }
+
+    if(!isAdmin() ||!isCommittee()){
+        restrictPage();
+    }
 }
 
 /**
@@ -82,8 +86,12 @@ if ($_GET) {
     if(!isExisted($con, 'col_id', 'college', $_GET['college_id'])){
         notFoundPage();
     }
-    if(isOwner($_GET['college_id'])){
-        $sql = "SELECT * FROM college WHERE col_id = ?";
+
+    if(!isOwner($_GET['college_id'])){
+        restrictPage();
+    }
+
+    $sql = "SELECT * FROM college WHERE col_id = ?";
         $rs = prepared_stm($con, $sql, [$_GET['college_id']])->get_result();
         $row = $rs->fetch_assoc();
 
@@ -93,7 +101,6 @@ if ($_GET) {
         $college_village     = $row['col_village'];
         $college_district    = $row['col_district'];
         $college_province    = $row['col_province'];
-    }
 }
 
 echo @$message;

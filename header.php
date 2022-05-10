@@ -12,7 +12,6 @@
     <link rel="stylesheet" href="css/all.css">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/dataTables.bootstrap5.min.css">
-
     <script defer src="js/all.js"></script>
     <script src="js/sweetalert2.all.min.js"></script>
     <?php
@@ -48,3 +47,8 @@
 </head>
 
 <body>
+<?php 
+    if(isMember()){
+        restrictPage('member_section');
+    }
+?>

@@ -1,6 +1,6 @@
 <?php
 session_start();
-$current_page = 'college';
+$current_page = 'move';
 require_once __DIR__ . '/include/define.php';
 require_once __DIR__ . '/include/function.php';
 require_once __DIR__ . '/include/dbconfig.php';
@@ -11,11 +11,11 @@ require_once __DIR__ . '/menu.php';
 ?>
 
 <div class="container mt-3">
-    <h2>ຈັດການຂໍ້ມູນການເຄື່ອນໄຫວ</h2>
+    <h2>ຈັດການຂໍ້ມູນຍ້າຍເຂົ້າ</h2>
 
     <?php if (isAdmin() || isCommittee()) : ?>
         <div class="mt-3" style="margin-bottom: 30px;">
-            <a href="activity_add.php" class="btn btn-primary">ເພີ່ມການເຄື່ອນໄຫວ</a>
+            <a href="move_in_add.php" class="btn btn-primary">ເພີ່ມຂໍ້ມູນຍ້າຍເຂົ້າ</a>
         </div>
     <?php endif; ?>
 
@@ -24,31 +24,29 @@ require_once __DIR__ . '/menu.php';
         <thead>
             <tr>
                 <th class="col-1">ລະຫັດ</th>
-                <th class="col-5">ຫົວຂໍ້</th>
-                <th class="col-3">ວັນທີ</th>
+                <th class="col-4">ຊື່ ນາມສະກຸນ</th>
+                <th class="col-2">ເລກທີເອກະສານ</th>
+                <th class="col-2">ວັນທີອອກເອກະສານ</th>
                 <th class="col-3">ໂຕເລືອກ</th>
             </tr>
         </thead>
         <tbody>
             <?php
-            $sql = "SELECT id,act_title,date_format(act_date,'%d/%m/%Y') as act_date,col_id FROM activity WHERE col_id = ".$_SESSION['college_id'];
+            $sql = "SELECT member_in.*, date_format(issue_date, '%d/%m/%Y') AS i_date FROM member_in JOIN member ON member.mem_id = member_in.mem_id WHERE member_in.col_id = ".$_SESSION['college_id'];
             $rs = $con->query($sql);
+            echo $con->error;
             while ($row = $rs->fetch_assoc()) {
                 echo '
                     <tr>
                         <td>' . $row['id'] . '</td>
-                        <td><a href="#" class="text-primary h4" onclick="getActivity(' . $row['id'] . ')">' . $row['act_title'] . '</a>';
-                echo        '<td>' . $row['act_date'] . '</td>
-                        <td>
-                            <button onclick="getActivity(' . $row['id'] . ')" type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                                ສະແດງ
-                            </button>';
-                if ($_SESSION['college_id'] == $row['col_id']) {
-                    echo '                
-                            <a href="activity_add.php?activity_id=' . $row['id'] . '" class="btn btn-success btn-sm">ແກ້ໄຂ</a>
-                            <a onclick="deleteActivity(' . $row['id'] . ')" href="#" class="btn btn-danger btn-sm">ລົບ</a>
-                    ';
-                }
+                        
+                        <td>'.$row['firstname'].' '.$row['lastname'].'</td>
+
+                        <td>'.$row['doc_no'].'</td>
+
+                        <td>'.$row['issue_date'].'</td>
+                        ';
+                        
 
                 echo '</td>
                 </tr>';

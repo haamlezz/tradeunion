@@ -1,9 +1,11 @@
 <?php
 session_start();
+$current_page = "Login";
 require_once __DIR__ . '/include/define.php';
 require_once __DIR__ . '/include/function.php';
 require_once __DIR__ . '/include/dbconfig.php';
 require_once __DIR__ . '/header.php';
+echo password_hash("spsvtv", PASSWORD_DEFAULT);
 ?>
 
 <!--ຮູບ-->

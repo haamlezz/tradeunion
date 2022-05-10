@@ -13,6 +13,12 @@ if (!isAdmin() && !isCommittee() && !$_GET) {
     restrictPage();
 }
 
+if($_GET && !isAdmin() && !isCommittee()){
+    restrictPage();
+}
+
+
+
 require __DIR__ . '/menu.php';
 
 $error = '';
@@ -56,7 +62,7 @@ if ($_POST) {
                     });
             </script>';
         } else {
-            $message = '
+            $message = '<script type="text/javascript">
             Swal.fire({
                 title: "ບໍ່ສຳເລັດ",
                 position: "top-center",
@@ -66,7 +72,7 @@ if ($_POST) {
             }).then(() => {
                 location.reload();
             });
-            ';
+            </script>';
         }
     } else if ($_POST['do'] == 'edit' && $error == '') {
         $activity_id   = $con->real_escape_string($_POST['activity_id']);
@@ -89,10 +95,16 @@ if ($_POST) {
     }
 }
 
-if ($_GET) {
+if ($_GET && isset($_GET['activity_id'])) {
     if(!isExisted($con, 'id', 'activity', $_GET['activity_id'])){
         notFoundPage();
     }
+
+
+    if(!isOwner($_GET['activity_id'])){
+        restrictPage();
+    }
+
     $sql = "SELECT * FROM activity WHERE id = ? AND col_id = ?";
         $rs = prepared_stm($con, $sql, [$_GET['activity_id'], $_SESSION['college_id']])->get_result();
         $row = $rs->fetch_assoc();
