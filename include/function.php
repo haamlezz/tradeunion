@@ -13,13 +13,10 @@ function prepared_stm($con, $sql, $params, $types=""){
     
     if($stm = $con->prepare($sql)){
         $stm->bind_param($types, ...$params);
-        echo $con->error;
         $stm->execute();
-        
         return $stm;
     }else{
-        echo $con->error;
-        return 0;
+        return $con->error;
     }
 }
 
@@ -75,12 +72,12 @@ function isOwner($college_id){
 function isExisted($con, $col, $table, $id){
     $sql = "SELECT $col FROM $table WHERE $col = ?";
     $rs = prepared_stm($con, $sql, [$id])->get_result();
+    $row = $rs->fetch_assoc();
     if($rs->num_rows == 1){
+        
         return true;
     }
-
     return false;
-
 }
 
 function restrictPage($location=null){

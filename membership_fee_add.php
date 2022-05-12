@@ -20,6 +20,7 @@ if ($_GET && !isAdmin() && !isCommittee()) {
 require __DIR__ . '/menu.php';
 
 $error = '';
+$message = '';
 
 /**
  * Add College
@@ -38,40 +39,60 @@ if ($_POST) {
         </script>';
     } else {
         $feeid = $con->real_escape_string($_POST['feeid']);
-        $paydate = date("Y-m-d");
-        if(isset($_POST['pay_date'])){
+        $paydate = date('Y-m-d');
+
+        if ($_POST['pay_date'] != '') {
             $paydate = $_POST['pay_date'];
         }
-        
+
+
 
         foreach ($_POST['mem_id'] as $m) {
-            $sql = "INSERT INTO membership_fee (mem_id, fee_id, pay_date) VALUE(?,?,?)";
-            $data = [$m, $feeid, $paydate];
-            prepared_stm($con, $sql, $data);
+            $sql0 = "SELECT id FROM membership_fee WHERE mem_id = ? AND fee_id = ?";
+            $rs0 = prepared_stm($con, $sql0, [$m, $feeid])->get_result();
+            if ($rs0->num_rows == 0) {
+                $sql = "INSERT INTO membership_fee (mem_id, fee_id, pay_date) VALUE(?,?,?)";
+                $data = [$m, $feeid, $paydate];
+                $rs = prepared_stm($con, $sql, $data);
+                if ($rs->affected_rows != 1) {
+                    $error = '<script type="text/javascript">
+                Swal.fire({
+                    title: "ບໍ່ສຳເລັດ",
+                    position: "top-center",
+                    icon: "warning",
+                    text: "ທ່ານຍັງບໍ່ທັນໄດ້ເລືອກສະມາຊິກ",
+                    button: "ລອງໃໝ່",
+                })
+                </script>';
+                }
+            }
         }
 
-        $message = '<script type="text/javascript">
-        Swal.fire({
-            title: "ສຳເລັດ",
-            position: "top-center",
-            icon: "success",
-            text: "ບັນທຶກຂໍ້ມູນສຳເລັດ",
-            button: "ຕົກລົງ",
-        }).then((data)=>{
-            window.location.href = "membership_fee.php";
-        });
+        if ($error == '') {
+            $message = '<script type="text/javascript">
+                Swal.fire({
+                    title: "ສຳເລັດ",
+                    position: "top-center",
+                    icon: "success",
+                    text: "ບັນທຶກຂໍ້ມູນສຳເລັດ",
+                    button: "ຕົກລົງ",
+                }).then((data)=>{
+                    window.location.href = "membership_fee.php";
+                });
         </script>';
+        }
     }
 }
 
-echo @$message;
+
+
 ?>
 
 <div class="container mt-3 mb-5">
     <h2>ເພີ່ມຂໍ້ມູນການເສຍຄ່າສະຕິປະຈຳປີ</h2>
 
     <?= @$error; ?>
-
+    <?= @$message; ?>
     <form method="post">
 
         <div class="row mt-5">
@@ -218,7 +239,7 @@ require __DIR__ . '/footer.php';
     });
 
 
-    $("body").on("click","#triggerCheck",function() {
+    $("body").on("click", "#triggerCheck", function() {
         var state = $(this).prop("checked");
         if (state == true) {
             $("tbody").find("input:checkbox").prop("checked", true);

@@ -31,7 +31,7 @@ require_once __DIR__ . '/menu.php';
         </thead>
         <tbody>
             <?php
-            $sql = "SELECT mem_id, firstname, lastname, gender, username, role, (SELECT groups.group_name FROM groups WHERE groups.id = member.group_id) AS g_name FROM member JOIN groups ON groups.id = member.group_id WHERE groups.col_id = ". $_SESSION['college_id'].";";
+            $sql = "SELECT mem_id, firstname, lastname, gender, username, role, (SELECT groups.group_name FROM groups WHERE groups.id = member.group_id) AS g_name, status FROM member JOIN groups ON groups.id = member.group_id WHERE groups.col_id = ". $_SESSION['college_id'].";";
         
             $rs = $con->query($sql);
             echo $con->error;

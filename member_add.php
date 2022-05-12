@@ -492,8 +492,8 @@ echo @$message;
                         <label for="status">ສະຖານະ</label>
                         <select class="form-control" name="status" id="status">
                             <option value="">ເລືອກສະຖານະ...</option>
-                            <option value="0" <?= $status==0?'selected':''?>>ປິດໃຊ້ງານ</option>
-                            <option value="1" <?= $status==1?'selected':''?>>ອະນຸມັດໃຊ້ງານ</option>
+                            <option value="0" <?= @$status==0?'selected':''?>>ປິດໃຊ້ງານ</option>
+                            <option value="1" <?= @$status==1?'selected':''?>>ອະນຸມັດໃຊ້ງານ</option>
                         </select>
                     </div>
 
@@ -502,9 +502,9 @@ echo @$message;
                         <label for="role">ສິດຖິການເຂົ້າເຖິງ</label>
                         <select class="form-control" name="role" id="role">
                             <option value="">ເລືອກສະຖານະ...</option>
-                            <option value="1" <?= $role==1?'selected':''?>>ຄະນະບໍລິຫານ</option>
-                            <option value="2" <?= $role==2?'selected':''?>>ຮາກຖານ</option>
-                            <option value="3" <?= $role==3?'selected':''?>>ສະມາຊິກທົ່ວໄປ</option>
+                            <option value="1" <?= @$role==1?'selected':''?>>ຄະນະບໍລິຫານ</option>
+                            <option value="2" <?= @$role==2?'selected':''?>>ຮາກຖານ</option>
+                            <option value="3" <?= @$role==3?'selected':''?>>ສະມາຊິກທົ່ວໄປ</option>
                         </select>
                     </div>
                     <?php }?>

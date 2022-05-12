@@ -62,13 +62,20 @@ if ($_POST) {
             $row = $rs->fetch_assoc();
             $mem_id = $row['mem_id'];
 
+            $sql0 = "SELECT MAX(DATE_FORMAT(pay_date, '%Y')) AS latest_year FROM membership_fee WHERE mem_id = $mem_id";
+            $rs0 = mysqli_query($con, $sql0);
+            $row0 = mysqli_fetch_assoc($rs0);
+
+            $latest_year = $row0['latest_year'];
+
             switch ($_POST['do']) {
                 case 'add':
-                    $sql = "INSERT INTO member_in (col_id, mem_id, doc_no, issue_date) VALUES(?,?,?,?)";
-
-                    $rs = prepared_stm($con, $sql, [$_SESSION['college_id'], $mem_id, $doc_no, $issue_date]);
-
-                    if ($rs->affected_rows == 1) {
+                    echo 'ADD';
+                    $sql_insert = "INSERT INTO member_out (col_id, mem_id, doc_no, issue_date, latest_paid_year) VALUES(?,?,?,?,?)";
+                    $data_insert = [$_SESSION['college_id'], $mem_id, $doc_no, $issue_date, $latest_year];
+                    $rs_insert = prepared_stm($con, $sql_insert, $data_insert );
+                    
+                    if ($rs_insert->affected_rows == 1) {
                         $message = '<script type="text/javascript">
                             Swal.fire({
                                         title:"ສຳເລັດ",
@@ -77,18 +84,20 @@ if ($_POST) {
                                         text: "ບັນທຶກຂໍ້ມູນສຳເລັດ",
                                         button: "ຕົກລົງ",
                                     }).then((data)=>{
-                                        window.location.href = "move_in.php";
+                                        window.location.href = "move_out.php";
                                     });
                             </script>';
                     }
                     break;
 
                 case 'edit':
-                    $sql = "UPDATE member_in SET doc_no=?, issue_date=?, mem_id=? WHERE id=?";
+                    $sql = "UPDATE member_out SET doc_no=?, issue_date=?, mem_id=? WHERE id=?";
                     $rs = prepared_stm($con, $sql, [$doc_no, $issue_date, $mem_id, $_POST['id']]);
-    
+                    
                     if ($rs->affected_rows == 1) {
-                        
+
+                        $sql = "UPDATE member SET member.status=2 WHERE mem_id=?";
+                        $rs = prepared_stm($con, $sql, [$mem_id]);
 
                         $message = '<script type="text/javascript">
                             Swal.fire({
@@ -98,7 +107,7 @@ if ($_POST) {
                                         text: "ບັນທຶກຂໍ້ມູນສຳເລັດ",
                                         button: "ຕົກລົງ",
                                     }).then((data)=>{
-                                        window.location.href = "move_in.php";
+                                        window.location.href = "move_out.php";
                                     });
                             </script>';
                     } else {
@@ -110,7 +119,7 @@ if ($_POST) {
                                 text: "ມີບາງຢ່າງຜິດພາດ",
                                 button: "ລອງໃໝ່",
                             }).then((data)=>{
-                                window.location.href = "move_in.php";
+                                window.location.href = "move_out.php";
                             });
                             </script>';
                     }
@@ -120,11 +129,11 @@ if ($_POST) {
 }
 
 if ($_GET && isset($_GET['id'])) {
-    if (!isExisted($con, 'id', 'member_in', $_GET['id'])) {
+    if (!isExisted($con, 'id', 'member_out', $_GET['id'])) {
         notFoundPage();
     }
 
-    $sql = "SELECT member_in.*, CONCAT(member.firstname, ' ', member.lastname) AS fullname FROM member_in JOIN member ON member.mem_id = member_in.mem_id WHERE id = ?";
+    $sql = "SELECT member_out.*, CONCAT(member.firstname, ' ', member.lastname) AS fullname FROM member_out JOIN member ON member.mem_id = member_out.mem_id WHERE id = ?";
     $rs = prepared_stm($con, $sql, [$_GET['id']])->get_result();
     $row = $rs->fetch_assoc();
 
@@ -137,12 +146,10 @@ echo @$message;
 ?>
 
 <div class="container mt-3 mb-5">
-    <h2>ເພີ່ມຂໍ້ມູນການຍ້າຍເຂົ້າ</h2>
+    <h2>ເພີ່ມຂໍ້ມູນການຍ້າຍອອກ</h2>
 
     <?= @$error; ?>
-
     <form method="post">
-
         <div class="row mt5">
             <div class="col-4">
                 <div class="form-group">
