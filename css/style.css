@@ -34,3 +34,10 @@ nav{
     left: auto;
 }
 
+.navbar a{
+    color: #ffffff !important;
+}
+
+.dropdown-menu a{
+    color:#333333 !important;
+} 

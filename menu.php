@@ -50,37 +50,39 @@
 
 
         <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            ລາຍງານ
+          <a class="nav-link dropdown-toggle <?= $current_page=='move'?'report':''; ?>" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            ລາຍງານພາຍໃນ
           </a>
           <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <li><a class="dropdown-item" href="#">Action</a></li>
-            <li><a class="dropdown-item" href="#">Another action</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="#">Something else here</a></li>
+            <li><a class="dropdown-item" href="rpt.php?page=college">ລາຍງານຂໍ້ມູນຮາກຖານ</a></li>
+            <li><a class="dropdown-item" href="rpt.php?page=member">ລາຍງານຂໍ້ມູນສະມາຊິກ</a></li>
+            <li><a class="dropdown-item" href="rpt.php?page=fee">ລາຍງານຂໍ້ມູນການເສຍຄ່າສະຕິ</a></li>
+            <li><a class="dropdown-item" href="rpt.php?page=in">ລາຍງານຂໍ້ມູນຍ້າຍເຂົ້າ</a></li>
+            <li><a class="dropdown-item" href="rpt.php?page=out">ລາຍງານຂໍ້ມູນຍ້າຍອອກ</a></li>
+            <li><a class="dropdown-item" href="rpt.php?page=activity">ລາຍງານຂໍ້ມູນການເຄື່ອນໄຫວ</a></li>
           </ul>
         </li>
+        <?php if(isAdmin()):?>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle <?= $current_page=='move'?'report':''; ?>" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            ລາຍງານລວມ
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <li><a class="dropdown-item" href="#">ລາຍງານຂໍ້ມູນຮາກຖານ</a></li>
+            <li><a class="dropdown-item" href="#">ລາຍງານຂໍ້ມູນສະມາຊິກແຕ່ລະຮາກຖານ</a></li>
+            <li><a class="dropdown-item" href="#">ລາຍງານຂໍ້ມູນການເສຍຄ່າສະຕິຂອງແຕ່ລະຮາກຖານ</a></li>
+            <li><a class="dropdown-item" href="#">ລາຍງານຂໍ້ມູນຍ້າຍເຂົ້າຂອງແຕ່ລະຮາກຖານ</a></li>
+            <li><a class="dropdown-item" href="#">ລາຍງານຂໍ້ມູນຍ້າຍອອກຂອງແຕ່ລະຮາຖານ</a></li>
+            <li><a class="dropdown-item" href="#">ລາຍງານຂໍ້ມູນການເຄື່ອນໄຫວຂອງແຕ່ລະຮາກຖານ</a></li>
+          </ul>
+        </li>
+        <?php endif;?>
 
 
         <li class="nav-item">
           <a class="nav-link" href="logout.php">ອອກລະບົບ</a>
         </li>
 
-
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Dropdown
-          </a>
-          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <li><a class="dropdown-item" href="#">Action</a></li>
-            <li><a class="dropdown-item" href="#">Another action</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="#">Something else here</a></li>
-          </ul>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
-        </li>
       </ul>
       <form class="d-flex">
         <input class="form-control me-2" type="search" placeholder="ຄົ້ນຫາ..." aria-label="Search">

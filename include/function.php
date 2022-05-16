@@ -153,3 +153,46 @@ function listMemberAutoComplete($con,$id){
         }
     echo '</datalist>';
 }
+
+
+function getReport($page){
+    $title = '';
+    switch($page){
+        case 'college': $title = 'ລາຍງານຮາກຖານ';
+        break;
+        case 'member': $title = 'ລາຍງານສະມາຊິກ';
+        break;
+        case 'fee': $title = 'ລາຍງານເສຍຄ່າສະຕິ';
+        break;
+        case 'in': $title = 'ລາຍງານຍ້າຍເຂົ້າ';
+        break;
+        case 'out': $title = 'ລາຍງານຍ້າຍອອກ';
+        break;
+        case 'activity': $title = 'ລາຍງານການເຄື່ອນໄຫວ';
+        break;
+    }
+
+    return $title;
+}
+
+function getReportQuery($page){
+    $sql = '';
+    switch($page){
+        case 'college': $sql = '
+        
+        ';
+        break;
+        case 'member': $sql = '';
+        break;
+        case 'fee': $sql = '';
+        break;
+        case 'in': $sql = '';
+        break;
+        case 'out': $sql = '';
+        break;
+        case 'activity': $sql = '';
+        break;
+    }
+
+    return $sql;
+}
