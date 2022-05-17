@@ -77,6 +77,7 @@ if ($_POST) {
     $addr_district = $con->real_escape_string($_POST['addr_district']);
     $addr_province = $con->real_escape_string($_POST['addr_province']);
     $book_no = $con->real_escape_string($_POST['book_no']);
+    $join_local = $con->real_escape_string($_POST['join_local']);
     $join_trade_union_date = $con->real_escape_string($_POST['join_trade_union_date']);
     if(!$_POST['join_party_date']==''){
         $join_party_date = $con->real_escape_string($_POST['join_party_date']);
@@ -109,7 +110,8 @@ if ($_POST) {
             $join_trade_union_date,
             $join_party_date,
             $join_women_union_date,
-            $group_id
+            $group_id,
+            $join_local
         ];
 
         $sql = "INSERT INTO member(
@@ -131,8 +133,9 @@ if ($_POST) {
             join_party_date,
             join_women_union_date,
             group_id,
+            join_local,
             status
-        ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,1)";
+        ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,1)";
 
         $rs = prepared_stm($con, $sql, $data);
 
@@ -184,7 +187,8 @@ if ($_POST) {
             $join_women_union_date,
             $group_id,
             $status,
-            $role
+            $role,
+            $join_local
         ];
         $sql = "UPDATE member SET
             username = ?,
@@ -205,7 +209,9 @@ if ($_POST) {
             join_women_union_date = ?,
             group_id = ?,
             status=?,
-            role=? ";
+            role=? ,
+            join_local=?
+            ";
 
         if($_POST['password'] != null){
             $password = $con->real_escape_string($_POST['password']);
@@ -219,6 +225,7 @@ if ($_POST) {
         $sql .= " WHERE mem_id = ".$mem_id;
 
         $rs = prepared_stm($con, $sql, $data);
+        
         if ($rs->affected_rows == 1) {
             $message = '<script type="text/javascript">
             Swal.fire({
@@ -261,6 +268,7 @@ if ($_GET) {
     $group_id = $row['group_id'];
     $status = $row['status'];
     $role = $row['role'];
+    $join_local = $row['join_local'];
 }
 
 echo @$message;
@@ -280,25 +288,25 @@ echo @$message;
             <div class="col-md-8">
                 <div class="form-group mb-2">
                     <label for="firstname">ຊື່</label>
-                    <input required value="<?= @$firstname ?>" require id="firstname" type="text" class="form-control <?= $isValid['firstname'] ?>" name="firstname" placeholder="ປ້ອນຊື່">
+                    <input required value="<?= @$firstname ?>" id="firstname" type="text" class="form-control <?= $isValid['firstname'] ?>" name="firstname" placeholder="ປ້ອນຊື່">
                 </div>
 
                 <div class="form-group mb-2">
                     <label for="lastname">ນາມສະກຸນ</label>
-                    <input required value="<?= @$lastname ?>" require id="lastname" type="text" class="form-control <?= @$isValid['lastname'] ?>" name="lastname" placeholder="ປ້ອນນາມສະກຸນ">
+                    <input required value="<?= @$lastname ?>" id="lastname" type="text" class="form-control <?= @$isValid['lastname'] ?>" name="lastname" placeholder="ປ້ອນນາມສະກຸນ">
                 </div>
 
                 <div class="row">
                     <div class="col-6">
                         <div class="form-group mb-2">
                             <label for="username">ຊື່ບັນຊີຜູ້ໃຊ້</label>
-                            <input required value="<?= @$username ?>" require id="username" type="text" class="form-control <?= @$isValid['username'] ?>" name="username" placeholder="ປ້ອນຊື່ບັນຊີຜູ້ໃຊ້">
+                            <input required value="<?= @$username ?>" id="username" type="text" class="form-control <?= @$isValid['username'] ?>" name="username" placeholder="ປ້ອນຊື່ບັນຊີຜູ້ໃຊ້">
                         </div>
                     </div>
                     <div class="col-6">
                         <div class="form-group">
                             <label for="password">ລະຫັດຜ່ານ</label>
-                            <input value="" <?php if(!isset($_GET['member_id'])){echo 'require';} ?> id="password" type="password" class="form-control <?= @$isValid['password'] ?>" name="password" placeholder="ປ້ອນລະຫັດຜ່ານ">
+                            <input value="" <?php if(!isset($_GET['member_id'])){echo 'required';} ?> id="password" type="password" class="form-control <?= @$isValid['password'] ?>" name="password" placeholder="ປ້ອນລະຫັດຜ່ານ">
                         </div>
                     </div>
                 </div>
@@ -307,7 +315,7 @@ echo @$message;
                     <div class="col-6">
                         <div class="form-group">
                             <label for="gender">ເພດ</label>
-                            <select name="gender" id="gender" class="form-control <?= @$isValid['gender'] ?>">
+                            <select required name="gender" id="gender" class="form-control <?= @$isValid['gender'] ?>">
                                 <option value="">ເລືອກເພດ...</option>
                                 <option value="ຊາຍ" <?= @$gender == 'ຊາຍ'? 'selected':'' ?>>ຊາຍ</option>
                                 <option value="ຍິງ" <?= @$gender == 'ຍິງ'? 'selected':'' ?>>ຍິງ</option>
@@ -433,7 +441,7 @@ echo @$message;
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="join_trade_union_date">ວັນທີເຂົ້າກຳມະບານ</label>
-                            <input value="<?= @$join_trade_union_date ?>" require id="join_trade_union_date" type="date" class="form-control <?= @$isValid['join_trade_union_date'] ?>" name="join_trade_union_date" placeholder="ປ້ອນວັນທີເຂົ້າກຳມະບານ">
+                            <input value="<?= @$join_trade_union_date ?>" required id="join_trade_union_date" type="date" class="form-control <?= @$isValid['join_trade_union_date'] ?>" name="join_trade_union_date" placeholder="ປ້ອນວັນທີເຂົ້າກຳມະບານ">
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -452,13 +460,13 @@ echo @$message;
                 </div>
 
                 <div class="row">
-                    <div class="col-6">
+                    <div class="col-4">
                         <div class="form-group">
                             <label for="book_no">ເລກທີປຶ້ມກຳມະບານ</label>
-                            <input value="<?= @$book_no ?>" require id="book_no" type="text" class="form-control <?= @$isValid['book_id'] ?>" name="book_no" placeholder="ປ້ອນເລກທີປຶ້ມ">
+                            <input value="<?= @$book_no ?>" required id="book_no" type="text" class="form-control <?= @$isValid['book_id'] ?>" name="book_no" placeholder="ປ້ອນເລກທີປຶ້ມ">
                         </div>
                     </div>
-                    <div class="col-6">
+                    <div class="col-4">
                         <div class="form-group">
                             <label for="group">ຈຸທີ່ສັງກັດ</label>
                             <select required name="group_id" id="group" class="form-control <?= @$isValid['group'] ?>">
@@ -473,6 +481,12 @@ echo @$message;
                                 }
                                 ?>
                             </select>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="form-group">
+                            <label for="join_local">ວັນທີຮັບເຂົ້າຮາກຖານ</label>
+                            <input value="<?= @$join_local ?>" required id="join_local" type="date" class="form-control <?= @$isValid['book_id'] ?>" name="join_local" placeholder="ປ້ອນວັນທີເຂົ້າຮາກຖານ">
                         </div>
                     </div>
                 </div>

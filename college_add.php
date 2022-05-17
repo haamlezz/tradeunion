@@ -9,21 +9,25 @@ if (!islogin()) {
     header('Location:login.php');
 }
 
+if(isMember()){
+    restrictPage();
+}
 
 require __DIR__ . '/menu.php';
 
 if(!isAdmin() && !$_GET){
+    
     restrictPage();
 }
 
 if($_GET){
-    if(isAdmin() || isCommittee()){
-        if(!isOwner($_GET['college_id'])){    
+    if(isCommittee()){
+        if(!isOwner($_GET['college_id'])){
             restrictPage();
         }
     }
 
-    if(!isAdmin() ||!isCommittee()){
+    if(!isAdmin() AND !isCommittee()){   
         restrictPage();
     }
 }
@@ -61,10 +65,13 @@ if ($_POST) {
             </script>';
         }
     } else if ($_POST['do'] == 'edit') {
+        print_r($_POST);
         $college_id   = $con->real_escape_string($_POST['college_id']);
-        $data = [$college_name, $college_tel, $college_email, $college_village, $college_district, $college_province, $college_id];
-        $sql = "UPDATE college SET col_name=?,tel=?, email=?, col_village=?, col_district=?, col_province=? WHERE col_id=? ";
-        $rs = prepared_stm($con, $sql, $data, 'ssssssi');
+        $local_president = $con->real_escape_string($_POST['president']);
+        $data = [$college_name, $college_tel, $college_email, $college_village, $college_district, $college_province, $local_president, $college_id];
+        $sql = "UPDATE college SET col_name=?,tel=?, email=?, col_village=?, col_district=?, col_province=?, local_president=? WHERE col_id=? ";
+        $rs = prepared_stm($con, $sql, $data, 'ssssssii');
+        print_r($rs);
         if($rs->affected_rows == 1){
             $message = '<script type="text/javascript">
             Swal.fire({
@@ -85,11 +92,7 @@ if ($_POST) {
 if ($_GET) {
     if(!isExisted($con, 'col_id', 'college', $_GET['college_id'])){
         notFoundPage();
-    }
-
-    if(!isOwner($_GET['college_id'])){
-        restrictPage();
-    }
+    } 
 
     $sql = "SELECT * FROM college WHERE col_id = ?";
         $rs = prepared_stm($con, $sql, [$_GET['college_id']])->get_result();
@@ -101,6 +104,7 @@ if ($_GET) {
         $college_village     = $row['col_village'];
         $college_district    = $row['col_district'];
         $college_province    = $row['col_province'];
+        $local_president     = $row['local_president'];
 }
 
 echo @$message;
@@ -116,19 +120,19 @@ echo @$message;
             <div class="col-md-6">
                 <div class="form-group">
                     <label for="collegeName">ຊື່ຮາກຖານ</label>
-                    <input value="<?= @$college_name ?>" require id="collegeName" type="text" class="form-control" name="college_name" placeholder="ປ້ອນຊື່ຮາກຖານ">
+                    <input value="<?= @$college_name ?>" required id="collegeName" type="text" class="form-control" name="college_name" placeholder="ປ້ອນຊື່ຮາກຖານ">
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="form-group">
                     <label for="collegeTel">ເບີໂທ</label>
-                    <input value="<?= @$college_tel ?>" require id="collegeTel" type="text" class="form-control" name="college_tel" placeholder="ປ້ອນເບີໂທ">
+                    <input value="<?= @$college_tel ?>" required id="collegeTel" type="text" class="form-control" name="college_tel" placeholder="ປ້ອນເບີໂທ">
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="form-group">
                     <label for="collegeEmail">ອີເມລ</label>
-                    <input value="<?= @$college_email ?>" require id="collegeEmail" type="email" class="form-control" name="college_email" placeholder="ປ້ອນອີເມລ">
+                    <input value="<?= @$college_email ?>" required id="collegeEmail" type="email" class="form-control" name="college_email" placeholder="ປ້ອນອີເມລ">
                 </div>
             </div>
         </div>
@@ -137,19 +141,53 @@ echo @$message;
             <div class="col-md-4">
                 <div class="form-group">
                     <label for="collegeVillage">ທີ່ຕັ້ງ</label>
-                    <input value="<?= @$college_village ?>" require id="collegeVillage" type="text" class="form-control" name="college_village" placeholder="ບ້ານ">
+                    <input value="<?= @$college_village ?>" required id="collegeVillage" type="text" class="form-control" name="college_village" placeholder="ບ້ານ">
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="form-group">
                     <label for="collegeDistrict"> </label>
-                    <input value="<?= @$college_district ?>" require id="collegeDistrict" type="text" class="form-control" name="college_district" placeholder="ເມືອງ">
+                    <input value="<?= @$college_district ?>" autocomplete="off" required id="collegeDistrict" type="text" class="form-control" name="college_district" placeholder="ເມືອງ">
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="form-group">
                     <label for="collegeProvince"> </label>
-                    <input value="<?= @$college_province ?>" require id="collegeProvince" type="text" class="form-control" name="college_province" placeholder="ແຂວງ">
+                    <input value="<?= @$college_province ?>" autocomplete="off" list="addr_province_list" required id="collegeProvince" type="text" class="form-control" name="college_province" placeholder="ແຂວງ">
+                    <?php dataListProvince('addr_province_list'); ?>
+                </div>
+            </div>
+        </div>
+
+        <hr class="mt-3 mb-3">
+
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <h4 class="text-secondary">ປະທານກຳມະບານຮາກຖານ</h4>
+            </div>
+
+            <div class="col-md-8">
+                <div class="form-group">
+                        <?php
+                            $sql = "SELECT member.mem_id, CONCAT(member.firstname,' ',member.lastname) AS fullname FROM member JOIN groups ON groups.id = member.group_id WHERE groups.col_id = ? AND member.role = 2";
+                            $rs = prepared_stm($con, $sql, [@$_GET['college_id']])->get_result() ;
+                            if($rs->num_rows == 0){
+                                echo 'ຍັງບໍ່ທັນມີສະມາຊິກ';
+                            }else{
+                                echo '<label for="presedent">ປະທານ</label>';
+                                echo '<select name="president" id="president" class="form-control">';
+                                echo '<option value="">ເລືອກປະທານຮາກຖານ</option>';
+                                while($row = $rs->fetch_assoc()){
+                                    echo '
+                                        <option '.($local_president==$row['mem_id']?'selected':'').' value="'.$row['mem_id'].'">'.$row['fullname'].'</option>
+                                    ';
+                                }
+
+                                echo '</select>';
+                            }
+                        ?>
+                    
+                    
                 </div>
             </div>
         </div>

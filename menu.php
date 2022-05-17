@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary d-print-none">
   <div class="container-fluid">
     <a class="navbar-brand" href="#"><img src="image/private_ed_logo.png" class="img-fluid" width="40" alt=""></a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -54,7 +54,7 @@
             ລາຍງານພາຍໃນ
           </a>
           <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <li><a class="dropdown-item" href="rpt.php?page=college">ລາຍງານຂໍ້ມູນຮາກຖານ</a></li>
+            
             <li><a class="dropdown-item" href="rpt.php?page=member">ລາຍງານຂໍ້ມູນສະມາຊິກ</a></li>
             <li><a class="dropdown-item" href="rpt.php?page=fee">ລາຍງານຂໍ້ມູນການເສຍຄ່າສະຕິ</a></li>
             <li><a class="dropdown-item" href="rpt.php?page=in">ລາຍງານຂໍ້ມູນຍ້າຍເຂົ້າ</a></li>
@@ -62,21 +62,23 @@
             <li><a class="dropdown-item" href="rpt.php?page=activity">ລາຍງານຂໍ້ມູນການເຄື່ອນໄຫວ</a></li>
           </ul>
         </li>
-        <?php if(isAdmin()):?>
+        
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle <?= $current_page=='move'?'report':''; ?>" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
             ລາຍງານລວມ
           </a>
           <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <li><a class="dropdown-item" href="#">ລາຍງານຂໍ້ມູນຮາກຖານ</a></li>
+          <li><a class="dropdown-item" href="rpt.php?page=college">ລາຍງານຂໍ້ມູນຮາກຖານ</a></li>
+          <?php if(isAdmin()):?>
             <li><a class="dropdown-item" href="#">ລາຍງານຂໍ້ມູນສະມາຊິກແຕ່ລະຮາກຖານ</a></li>
             <li><a class="dropdown-item" href="#">ລາຍງານຂໍ້ມູນການເສຍຄ່າສະຕິຂອງແຕ່ລະຮາກຖານ</a></li>
             <li><a class="dropdown-item" href="#">ລາຍງານຂໍ້ມູນຍ້າຍເຂົ້າຂອງແຕ່ລະຮາກຖານ</a></li>
             <li><a class="dropdown-item" href="#">ລາຍງານຂໍ້ມູນຍ້າຍອອກຂອງແຕ່ລະຮາຖານ</a></li>
             <li><a class="dropdown-item" href="#">ລາຍງານຂໍ້ມູນການເຄື່ອນໄຫວຂອງແຕ່ລະຮາກຖານ</a></li>
+            <?php endif;?>
           </ul>
         </li>
-        <?php endif;?>
+        
 
 
         <li class="nav-item">

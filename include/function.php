@@ -158,7 +158,7 @@ function listMemberAutoComplete($con,$id){
 function getReport($page){
     $title = '';
     switch($page){
-        case 'college': $title = 'ລາຍງານຮາກຖານ';
+        case 'college': $title = 'ລາຍງານຂໍ້ມູນຮາກຖານພາກເອກະຊົນ';
         break;
         case 'member': $title = 'ລາຍງານສະມາຊິກ';
         break;
@@ -171,28 +171,90 @@ function getReport($page){
         case 'activity': $title = 'ລາຍງານການເຄື່ອນໄຫວ';
         break;
     }
-
     return $title;
 }
 
-function getReportQuery($page){
+function getReportQuery($page, $otherQuery=null){
     $sql = '';
     switch($page){
-        case 'college': $sql = '
-        
-        ';
+        case 'college': $sql = "
+            SELECT 
+            college.col_name, 
+            college.tel, 
+            college.email, 
+            CONCAT(college.col_village,', ',college.col_district,', ',college.col_province) AS col_address, 
+            (SELECT CONCAT(member.firstname, ' ', member.lastname) FROM member WHERE member.mem_id = college.local_president ) AS president,
+            (SELECT COUNT(member.gender) from member JOIN groups ON groups.id = member.group_id WHERE groups.col_id = college.col_id AND member.status != 2) AS total_member, 
+            (SELECT COUNT(member.gender) from member JOIN groups ON groups.id = member.group_id WHERE groups.col_id = college.col_id AND member.gender = 'ຍິງ' AND member.status != 2) AS female_member 
+            from college
+            ORDER BY total_member DESC;
+            ";
+            break;
+            case 'member': $sql = "
+            SELECT 
+            CONCAT(member.firstname, ' ', member.lastname) AS fullname, 
+            CONCAT(member.h_village, ' ', member.h_district, ' ', member.h_province) AS hometown, 
+            CONCAT(member.addr_village, ' ', member.addr_district, ' ', member.addr_province) AS current_address, 
+            DATE_FORMAT(member.join_trade_union_date, '%d/%m/%Y') AS j_t_d, 
+            groups.group_name , 
+            member.role,
+            member.gender
+            FROM member 
+            JOIN groups ON groups.id = member.group_id
+            WHERE groups.col_id = ". $_SESSION['college_id'] ."  
+            AND member.status <> 2 ";
+
+            if($otherQuery!=null){
+                $sql .= $otherQuery;
+            }else{
+                $sql .= " AND YEAR(join_local) <= ". date('Y');
+            }
+            $sql .= " ORDER BY member.status ASC, fullname
+            ;
+            ";
         break;
-        case 'member': $sql = '';
+        case 'fee': $sql = "
+            SELECT 
+            
+            membership_fee.* , 
+            CONCAT(member.firstname,' ',member.lastname) AS fullname ,
+            member.gender , 
+            yearly_fee.fee ,
+            member.role, 
+            (SELECT yearly_fee.year FROM yearly_fee WHERE yearly_fee.id = membership_fee.fee_id) AS membership_year 
+            FROM member 
+            JOIN membership_fee ON membership_fee.mem_id = member.mem_id 
+            JOIN groups ON groups.id = member.group_id
+            JOIN yearly_fee ON yearly_fee.id = membership_fee.fee_id 
+            WHERE groups.col_id = ". $_SESSION['college_id'] . " ";
+            if($otherQuery != null){
+                $sql .= $otherQuery;
+            }else{
+                $sql .= " AND yearly_fee.year = ". date('Y') ." ";
+            }
+            $sql .= " ORDER BY member.role ASC ";
         break;
-        case 'fee': $sql = '';
+        case 'in': $sql = "
+            SELECT 
+            CONCAT(member.firstname, ' ', member.lastname) AS fullname,
+            DATE_FORMAT(member_in.issue_date, '%d/%m/%Y') AS i_d,
+            member_in.doc_no,
+            groups.group_name,
+            member.gender,
+            member.role
+            FROM member
+            JOIN groups ON groups.id = member.group_id 
+            JOIN member_in ON member_in.mem_id = member.mem_id 
+            WHERE groups.col_id = ".$_SESSION['college_id']."
+            AND YEAR(member_in.issue_date) = ".date('Y')."
+            ; 
+
+        ";
         break;
-        case 'in': $sql = '';
+        case 'out': $sql = "";
         break;
-        case 'out': $sql = '';
-        break;
-        case 'activity': $sql = '';
+        case 'activity': $sql = "";
         break;
     }
-
     return $sql;
 }
