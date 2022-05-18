@@ -16,3 +16,5 @@ $conn = new mysqli($server, $username, $password, $db);
 // if($con->connect_error){
 //     die('Database Connection failed: '. $con->connect_error);
 // }
+
+//mysql://baa1297f06529c:8b12aaab@us-cdbr-east-05.cleardb.net/heroku_174c0b283fa36b4?reconnect=true
