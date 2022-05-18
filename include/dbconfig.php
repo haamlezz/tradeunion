@@ -8,6 +8,7 @@ $password = $url["pass"];
 $db = substr($url["path"], 1);
 
 $con = new mysqli($server, $username, $password, $db);
+$con->set_charset("utf8");
 
 // //ສ້າງການເຊື່ອມຕໍ່ຖານຂໍ້ມູນ
 // $con = new mysqli(DB_HOST,DB_USER,DB_PASSWORD,DB_NAME);
