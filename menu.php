@@ -50,7 +50,7 @@
 
 
         <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle <?= $current_page=='move'?'report':''; ?>" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+          <a class="nav-link dropdown-toggle <?= $current_page=='report'?'active':''; ?>" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
             ລາຍງານພາຍໃນ
           </a>
           <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
@@ -64,17 +64,17 @@
         </li>
         
         <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle <?= $current_page=='move'?'report':''; ?>" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+          <a class="nav-link dropdown-toggle <?= $current_page=='report-all'?'active':''; ?>" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
             ລາຍງານລວມ
           </a>
           <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-          <li><a class="dropdown-item" href="rpt.php?page=college">ລາຍງານຂໍ້ມູນຮາກຖານ</a></li>
+          <li><a class="dropdown-item" href="rpt_all.php?page=college">ລາຍງານຂໍ້ມູນຮາກຖານ</a></li>
           <?php if(isAdmin()):?>
-            <li><a class="dropdown-item" href="#">ລາຍງານຂໍ້ມູນສະມາຊິກແຕ່ລະຮາກຖານ</a></li>
-            <li><a class="dropdown-item" href="#">ລາຍງານຂໍ້ມູນການເສຍຄ່າສະຕິຂອງແຕ່ລະຮາກຖານ</a></li>
-            <li><a class="dropdown-item" href="#">ລາຍງານຂໍ້ມູນຍ້າຍເຂົ້າຂອງແຕ່ລະຮາກຖານ</a></li>
-            <li><a class="dropdown-item" href="#">ລາຍງານຂໍ້ມູນຍ້າຍອອກຂອງແຕ່ລະຮາຖານ</a></li>
-            <li><a class="dropdown-item" href="#">ລາຍງານຂໍ້ມູນການເຄື່ອນໄຫວຂອງແຕ່ລະຮາກຖານ</a></li>
+            <li><a class="dropdown-item" href="rpt_all.php?page=member">ລາຍງານຂໍ້ມູນສະມາຊິກແຕ່ລະຮາກຖານ</a></li>
+            <li><a class="dropdown-item" href="rpt_all.php?page=fee">ລາຍງານຂໍ້ມູນການເສຍຄ່າສະຕິຂອງແຕ່ລະຮາກຖານ</a></li>
+            <li><a class="dropdown-item" href="rpt_all.php?page=in">ລາຍງານຂໍ້ມູນຍ້າຍເຂົ້າຂອງແຕ່ລະຮາກຖານ</a></li>
+            <li><a class="dropdown-item" href="rpt_all.php?page=out">ລາຍງານຂໍ້ມູນຍ້າຍອອກຂອງແຕ່ລະຮາຖານ</a></li>
+            <li><a class="dropdown-item" href="rpt_all.php?page=activity">ລາຍງານຂໍ້ມູນການເຄື່ອນໄຫວຂອງແຕ່ລະຮາກຖານ</a></li>
             <?php endif;?>
           </ul>
         </li>

@@ -15,39 +15,53 @@ if ($_POST) {
 
     $password = $_POST['password'];
 
-    $sql = "SELECT username, member.role, group_id, member.password FROM member WHERE username = ?";
+    $sql = "SELECT username, member.role, group_id, member.password, member.status FROM member WHERE username = ?";
     
     $rs = prepared_stm($con, $sql, [$username])->get_result();
 
     $row = $rs->fetch_assoc();
-    if (password_verify($password, $row['password'])) {
-        $_SESSION['login'] = true;
-        $_SESSION['username'] = $username;
-        $_SESSION['role'] = $row['role'];
+    
 
-        $sql = "SELECT groups.col_id, college.col_id as college_id FROM groups JOIN college ON groups.col_id = college.col_id WHERE groups.id = ?";
-        $rs2 = prepared_stm($con, $sql, [$row['group_id']],"i")->get_result();
-        $row2 = $rs2->fetch_assoc();
-        $_SESSION['college_id'] = $row2['college_id'];
+    if($row['status']==0){
+        header('Location:not_active.php');
+    }else{
 
-        $_SESSION['error_msg'] = null;
-        header('Location:index.php');
-    } else {
-        if (isset($_SESSION['login_attempt'])) {
-            $_SESSION['login_attempt'] += 1;
-            if ($_SESSION['login_attempt'] >= 3) {
-                echo '<div class="alert alert-info text-center">
-                        ທ່ານໃສ່ລະຫັດຜິດຫຼາຍຄັ້ງ ກະລຸນາລໍຖ້າ 10 ວິນາທີ
-                    </div>';
-                sleep(10);
-                $_SESSION['login_attempt'] = 0;
+        if (password_verify($password, $row['password'])) {
+            $_SESSION['login'] = true;
+            $_SESSION['username'] = $username;
+            $_SESSION['role'] = $row['role'];
+
+            $sql = "SELECT groups.col_id, college.col_id as college_id FROM groups JOIN college ON groups.col_id = college.col_id WHERE groups.id = ?";
+            $rs2 = prepared_stm($con, $sql, [$row['group_id']],"i")->get_result();
+            $row2 = $rs2->fetch_assoc();
+            $_SESSION['college_id'] = $row2['college_id'];
+
+            $_SESSION['error_msg'] = null;
+
+            if($row['role'] = 3){
+                header('Location:member_section.php');
+            }else{
+                header('Location:index.php');
             }
-        } else {
-            $_SESSION['login_attempt'] = 1;
-        }
 
-        $_SESSION['error_msg'] = '<div class="alert alert-danger">ຊື່ບັນຊີ ຫຼື ລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ, ກະລຸນາລອງໃໝ່ອີກຄັ້ງ</div>';
-        header('Location:login.php');
+            
+        } else {
+            if (isset($_SESSION['login_attempt'])) {
+                $_SESSION['login_attempt'] += 1;
+                if ($_SESSION['login_attempt'] >= 3) {
+                    echo '<div class="alert alert-info text-center">
+                            ທ່ານໃສ່ລະຫັດຜິດຫຼາຍຄັ້ງ ກະລຸນາລໍຖ້າ 10 ວິນາທີ
+                        </div>';
+                    sleep(10);
+                    $_SESSION['login_attempt'] = 0;
+                }
+            } else {
+                $_SESSION['login_attempt'] = 1;
+            }
+
+            $_SESSION['error_msg'] = '<div class="alert alert-danger">ຊື່ບັນຊີ ຫຼື ລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ, ກະລຸນາລອງໃໝ່ອີກຄັ້ງ</div>';
+            header('Location:login.php');
+        }
     }
 }
 

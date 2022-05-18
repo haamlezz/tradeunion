@@ -18,10 +18,17 @@ $page = $_GET['page'];
         <br>
         ສັນຕິພາບ ເອກະລາດ ປະຊາທິປະໄຕ ເອກະພາບ ວັດທະນາຖາວອນ
     </p>
-    <div class="d-none d-print-block">    
+    <div class="d-none d-print-block"  style="font-size: 12px;">    
         <p class="d-flex justify-content-between">
             <span>ສະຫະພັນກຳມະບານ ກະຊວງສຶກສາທິການ ແລະ ກິລາ<br>
-            ສະຫະພັນກຳມະບານ ການສຶກສາພາກເອກະຊົນ</span>
+            ສະຫະພັນກຳມະບານ ການສຶກສາພາກເອກະຊົນ<br>
+            <?php
+                $sql = "SELECT col_name FROM college WHERE col_id = ".$_SESSION['college_id']."; ";
+                $rs = mysqli_query($con, $sql);
+                $row = mysqli_fetch_assoc($rs);
+                echo $row['col_name'];
+            ?>
+        </span>
 
             <span class="text-end">
                 <br>ເລກທີ........./ກບ.ສກອ<br>
@@ -52,45 +59,7 @@ $page = $_GET['page'];
     $count = 1;
     $total=$female = 0;
 
-    if($page == 'college'){
-        $rs = mysqli_query($con, getReportQuery($page));
-        echo mysqli_error($con);
-        echo '
-        <table class="table table-bordered table-striped table-sm">
-                <thead class="table-dark">
-                    <tr>
-                        <th>ລຳດັບ</th>
-                        <th>ຮາກຖານ</th>
-                        <th>ປະທານ ກມບ ຮາກຖານ</th>
-                        <th>ສະມາຊິກກຳມະບານ</th>
-                        <th>ທີ່ຢູ່ ຕິດຕໍ່</th>
-                    </tr>
-                </thead>
-                <tbody>
-                ';
-            while($row = mysqli_fetch_assoc($rs)){
-                echo '
-                    <tr>
-                        <td>'.$count++.'</td>
-                        <td>'.$row['col_name'].'</td>
-                        <td>'.$row['president'].'<td>
-                            ທັງໝົດ: '.$row['total_member'].' ສະຫາຍ
-                            <br>
-                            ເປັນຍິງ: '.$row['female_member'].'ສະຫາຍ
-                        </td>
-                        <td>
-                            '.$row['col_address'].'<br>
-                            '.$row['tel'].'<br>
-                            '.$row['email'].'
-                        </td>
-                    </tr>
-                ';
-            }
-        echo '
-                </tbody>
-        </table>
-        ';
-    } else if($page == 'member'){
+    if($page == 'member'){
         echo '
         <form action="rpt.php?page=member">
         <div class="mt-3 mb-3 d-print-none row g-3">
@@ -102,6 +71,7 @@ $page = $_GET['page'];
         JOIN groups ON groups.id = member.group_id
         WHERE groups.col_id = ". $_SESSION['college_id'] ."
         GROUP BY YEAR(join_local)
+        ORDER BY YEAR(join_local) DESC
         ;";
 
         $y_rs = mysqli_query($con, $sql);
@@ -153,7 +123,7 @@ $page = $_GET['page'];
         }
 
         echo '
-            <tr class="text-success text-center h4">
+            <tr class="table-success text-center h4">
                 <td colspan="7">ທັງໝົດ '. mysqli_num_rows($rs) .' ສະຫາຍ (ເປັນຍິງ '.$female.' ສະຫາຍ)</td>
             </tr>
         ';
@@ -316,6 +286,7 @@ $page = $_GET['page'];
         $sql = "SELECT 
         YEAR(member_in.issue_date) AS y
         FROM member_in
+        WHERE col_id = ". $_SESSION['college_id'] ."
         GROUP BY YEAR(member_in.issue_date)
         ORDER BY YEAR(member_in.issue_date) DESC
         ;";
@@ -335,7 +306,7 @@ $page = $_GET['page'];
         $rs = mysqli_query($con, getReportQuery($page));
         if(isset($_GET['year'])  && $_GET['year'] != ''){
             $year = mysqli_real_escape_string($con, $_GET['year']);
-            $rs = mysqli_query($con, getReportQuery($page, " AND yearly_fee.year= $year "));
+            $rs = mysqli_query($con, getReportQuery($page, " AND YEAR(member_in.issue_date) = $year "));
         }
 
             echo '
@@ -378,84 +349,167 @@ $page = $_GET['page'];
             ';
 
     }else if($page == 'out'){
+        echo '
+        <form action="rpt.php">
+        <div class="mt-3 mb-3 d-print-none row g-3">
+        ';
+        //ເລືອກປີ
+        $sql = "SELECT 
+        YEAR(member_out.issue_date) AS y
+        FROM member_out
+        WHERE col_id = ". $_SESSION['college_id'] ."
+        GROUP BY YEAR(member_out.issue_date)
+        ORDER BY YEAR(member_out.issue_date) DESC
+        ;";
+
+        $y_rs = mysqli_query($con, $sql);
+        echo '<div class="col-1"><label class="col-form-label" for="year">ເລືອກປີ</label></div>';
+        echo '<div class="col-2"><select class="form-control" id="year" name="year">';
+        echo '<option value="">ເລືອກປີ...</option>';
+        while($row = mysqli_fetch_assoc($y_rs)){
+            echo '<option '.($row['y']==@$_GET['year']?'selected':'').' value="'.$row['y'].'">'.$row['y'].'</option>';
+        }
+        echo '</select></div>
+            <input type="hidden" name="page" value="'.$page.'"/>
+            <div class="col-2"><input type="submit" value="ສະແດງຜົນ" class="btn btn-outline-success"></div>
+        </div></form>';
+        $year = null ;
+        $rs = mysqli_query($con, getReportQuery($page));
+        if(isset($_GET['year'])  && $_GET['year'] != ''){
+            $year = mysqli_real_escape_string($con, $_GET['year']);
+            $rs = mysqli_query($con, getReportQuery($page, " AND YEAR(member_out.issue_date) = $year "));
+        }
+
+            echo '
+                <table class="table table-bordered table-striped table-sm">
+                <thead class="table-dark">
+                    <th>ລຳດັບ</th>
+                    <th>ເພດ</th>
+                    <th>ຊື່ ແລະ ນາມສະກຸນ</th>
+                    <th>ສະຖານະພາບ</th>
+                    <th>ເລກທີເອກະສານ</th>
+                    <th>ລົງວັນທີ</th>
+                    <th>ຈ່າຍຄ່າສະຕິຄັ້ງສຸດ</th>
+                </thead>
+            <tbody>
+        ';
+          
+            while($row = mysqli_fetch_assoc($rs)){
+                if($row['gender']=='ຍິງ'){$female++;}
+                echo '
+                    <tr>
+                        <td>'.$count++.'</td>
+                        <td>'.$row['gender'].'</td>
+                        <td>'.$row['fullname'].'</td>
+                        <td>
+                            '. ($row['role']<=2?'ພະນັກງານ':'ນັກສຶກສາ') .'
+                        </td>
+                        <td>'.$row['doc_no'].'</td>
+                        <td>'.$row['i_d'].'</td>
+                        <td>ປີ '.$row['latest_paid_year'].'</td>
+                    </tr>
+                ';
+            }
+        
+            echo '
+                <tr class="table-success text-center h4">
+                    <td colspan="7">
+                        ລວມ '.mysqli_num_rows($rs).' ສະຫາຍ (ເປັນຍິງ '.$female.' ສະຫາຍ)
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            ';
 
     }else if($page == 'activity'){
+        echo '
+        <form action="rpt.php">
+        <div class="mt-3 mb-3 d-print-none row g-3">
+        ';
+        //ເລືອກປີ
+        $sql = "SELECT 
+        YEAR(activity.act_date) AS y
+        FROM activity
+        GROUP BY YEAR(activity.act_date)
+        ORDER BY YEAR(activity.act_date) DESC
+        ;";
 
+        $y_rs = mysqli_query($con, $sql);
+        echo '<div class="col-1"><label class="col-form-label" for="year">ເລືອກປີ</label></div>';
+        echo '<div class="col-2"><select class="form-control" id="year" name="year">';
+        while($row = mysqli_fetch_assoc($y_rs)){
+            echo '<option '.($row['y']==@$_GET['year']?'selected':'').' value="'.$row['y'].'">'.$row['y'].'</option>';
+        }
+        echo '</select>
+        </div>
+            <div class="col-2">
+                <select name="quarter" class="form-control">
+                    <option '.(@$_GET['quarter']==1?'selected':'').' value="1">ໄຕມາດ 1</option>
+                    <option '.(@$_GET['quarter']==2?'selected':'').'  value="2">ໄຕມາດ 2</option>
+                    <option '.(@$_GET['quarter']==3?'selected':'').'  value="3">ໄຕມາດ 3</option>
+                    <option '.(@$_GET['quarter']==4?'selected':'').'  value="4">ໄຕມາດ 4</option>
+                </select>
+            </div>
+            <input type="hidden" name="page" value="'.$page.'"/>
+            <div class="col-2"><input type="submit" value="ສະແດງຜົນ" class="btn btn-outline-success"></div>
+        </div></form>';
+        $year = null ;
+        $quarter = null;
+        $otherSql = null;
+        $rs = mysqli_query($con, getReportQuery($page));
+        if(isset($_GET['year'])  && $_GET['year'] != '' && $_GET['quarter']){
+            $year = mysqli_real_escape_string($con, $_GET['year']);
+            $quarter = mysqli_real_escape_string($con, $_GET['quarter']);
+            if($quarter == 1){
+                $otherSql = "
+                 AND MONTH(act_date) >= 1 OR MONTH(act_date) <= 3
+                ";
+            }else if($quarter == 2){
+                $otherSql = "
+                 AND (MONTH(act_date) >= 4 AND MONTH(act_date) <=  6)
+                ";
+            }else if($quarter == 3){
+                $otherSql = "
+                 AND (MONTH(act_date) >= 7 AND MONTH(act_date) <=  9)
+                ";
+            }else{
+                $otherSql = "
+                 AND (MONTH(act_date) >= 10 AND MONTH(act_date) <=  12)
+                ";
+            }
+            $rs = mysqli_query($con, getReportQuery($page, " AND YEAR(act_date) = $year " . $otherSql));
+        }
+            echo '<div class="container">';
+            while($row = mysqli_fetch_assoc($rs)){
+                echo '
+                    <div class="mb-3">
+                        <h2>'.$row['act_title'].'</h2>
+                        <p class="text-secondary" >ທີ່: '.$row['act_location'].' &nbsp;&nbsp;&nbsp;
+                        ວັນທີ: '.$row['a_d'].'</p>
+                        <div style="padding-left:20px;">
+                            '.$row['act_detail'].'
+                        </div>
+                    </div>
+                    
+                ';
+            }
+            echo '</div>';
     }else {
         echo '<h2>ກະລຸນາເລືອກລາຍງານ</h2>';
     }
 
 ?>
 
+    <p class="text-end d-none d-print-block mt-5">ປະທານສະຫະພັນກຳມະບານຮາຖານ</p>
+    <p></p>
+    <p></p>
+    <p></p>
+    <p class="text-end d-none d-print-block mt-5">................................................</p>
+
 </div><!-- fluid -->
 <?php
 require __DIR__ . '/footer.php';
 ?>
 
-<script>
-    $(document).ready(function() {
-        $('#example').DataTable();
-
-        // /*ແຍກຈຸດຫຼັກພັນ ....*/
-        // $('#incentive').priceFormat({
-        //     prefix: '',
-        //     suffix: ' ກີບ',
-        //     thounsandsSeparator: ',',
-        //     centsLimit: 0
-        // });
-    });
-
-
-    function getActivity(activity_id) {
-
-        $.ajax({
-            url: "activity_view.php",
-            method: "post",
-            data: {
-                activity_id: activity_id
-            },
-            success: function(data) {
-                $('#college_detail').html(data);
-                $('#exampleModal').modal("show");
-            }
-        });
-    }
-
-    function deleteActivity(activity_id) {
-
-        Swal.fire({
-            title: "ຕ້ອງການລືບແທ້ ຫຼື ບໍ່?",
-            text: "ທ່ານຈະບໍ່ສາມາດກູ້ຂໍ້ມູນຄືນໄດ້!",
-            icon: "warning",
-            showDenyButton: true,
-            confirmButtonText: 'ຕົກລົງ',
-            denyButtonText: 'ບໍ່',
-            dangerMode: true,
-            buttons: ['ຍົກເລີກ', 'ຕົກລົງ']
-        }).then((willDelete) => {
-            if (willDelete.isConfirmed) {
-                console.log("delete")
-                $.ajax({
-                    url: "activity_delete.php",
-                    method: "post",
-                    data: {
-                        activity_id: activity_id
-                    },
-                    success: function(data) {
-                        console.log(data)
-                        Swal.fire("ສໍາເລັດ", "ຂໍ້ມູນຖືກລືບອອກຈາກຖານຂໍ້ມູນແລ້ວ", "success", {
-                            button: "ຕົກລົງ",
-                        }).then(()=>{
-                            location.reload();
-                        });
-                    }
-                });
-            }
-        });
-
-
-
-    }
-</script>
 
 <?php endif;?>

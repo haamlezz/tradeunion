@@ -56,7 +56,7 @@ require_once __DIR__ . '/menu.php';
                 if ($_SESSION['college_id'] == $row['col_id']) {
                     echo '                
                             <a href="move_out_add.php?id=' . $row['id'] . '" class="btn btn-success btn-sm">ແກ້ໄຂ</a>
-                            <a onclick="deleteActivity(' . $row['id'] . ')" href="#" class="btn btn-danger btn-sm">ລົບ</a>
+                            <a onclick="deleteMoveOut(' . $row['id'] . ')" href="#" class="btn btn-danger btn-sm">ລົບ</a>
                     ';
                 }
 
@@ -68,25 +68,6 @@ require_once __DIR__ . '/menu.php';
     </table>
     </div>
 </div><!-- container-->
-
-
-<!-- Modal -->
-<div class="modal fade " id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">ຂໍ້ມູນການເຄື່ອນໄຫວ</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body" id="college_detail">
-
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ປິດ</button>
-            </div>
-        </div>
-    </div>
-</div>
 
 
 <?php
@@ -106,7 +87,7 @@ require __DIR__ . '/footer.php';
         // });
     });
 
-    function deleteActivity(activity_id) {
+    function deleteMoveOut(id) {
 
         Swal.fire({
             title: "ຕ້ອງການລືບແທ້ ຫຼື ບໍ່?",
@@ -121,10 +102,10 @@ require __DIR__ . '/footer.php';
             if (willDelete.isConfirmed) {
                 console.log("delete")
                 $.ajax({
-                    url: "activity_delete.php",
+                    url: "move_out_delete.php",
                     method: "post",
                     data: {
-                        activity_id: activity_id
+                        id: id
                     },
                     success: function(data) {
                         console.log(data)

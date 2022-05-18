@@ -174,23 +174,12 @@ function getReport($page){
     return $title;
 }
 
+
+
 function getReportQuery($page, $otherQuery=null){
     $sql = '';
     switch($page){
-        case 'college': $sql = "
-            SELECT 
-            college.col_name, 
-            college.tel, 
-            college.email, 
-            CONCAT(college.col_village,', ',college.col_district,', ',college.col_province) AS col_address, 
-            (SELECT CONCAT(member.firstname, ' ', member.lastname) FROM member WHERE member.mem_id = college.local_president ) AS president,
-            (SELECT COUNT(member.gender) from member JOIN groups ON groups.id = member.group_id WHERE groups.col_id = college.col_id AND member.status != 2) AS total_member, 
-            (SELECT COUNT(member.gender) from member JOIN groups ON groups.id = member.group_id WHERE groups.col_id = college.col_id AND member.gender = 'ຍິງ' AND member.status != 2) AS female_member 
-            from college
-            ORDER BY total_member DESC;
-            ";
-            break;
-            case 'member': $sql = "
+        case 'member': $sql = "
             SELECT 
             CONCAT(member.firstname, ' ', member.lastname) AS fullname, 
             CONCAT(member.h_village, ' ', member.h_district, ' ', member.h_province) AS hometown, 
@@ -202,12 +191,12 @@ function getReportQuery($page, $otherQuery=null){
             FROM member 
             JOIN groups ON groups.id = member.group_id
             WHERE groups.col_id = ". $_SESSION['college_id'] ."  
-            AND member.status <> 2 ";
+            ";
 
             if($otherQuery!=null){
                 $sql .= $otherQuery;
             }else{
-                $sql .= " AND YEAR(join_local) <= ". date('Y');
+                $sql .= " AND (YEAR(join_local) <= ". date('Y') . " AND member.status <> 2  )";
             }
             $sql .= " ORDER BY member.status ASC, fullname
             ;
@@ -226,11 +215,13 @@ function getReportQuery($page, $otherQuery=null){
             JOIN membership_fee ON membership_fee.mem_id = member.mem_id 
             JOIN groups ON groups.id = member.group_id
             JOIN yearly_fee ON yearly_fee.id = membership_fee.fee_id 
-            WHERE groups.col_id = ". $_SESSION['college_id'] . " ";
+            WHERE groups.col_id = ". $_SESSION['college_id'] . " 
+            
+            ";
             if($otherQuery != null){
                 $sql .= $otherQuery;
             }else{
-                $sql .= " AND yearly_fee.year = ". date('Y') ." ";
+                $sql .= " AND (yearly_fee.year = ". date('Y') ." AND member.status <> 2 )";
             }
             $sql .= " ORDER BY member.role ASC ";
         break;
@@ -245,16 +236,203 @@ function getReportQuery($page, $otherQuery=null){
             FROM member
             JOIN groups ON groups.id = member.group_id 
             JOIN member_in ON member_in.mem_id = member.mem_id 
-            WHERE groups.col_id = ".$_SESSION['college_id']."
-            AND YEAR(member_in.issue_date) = ".date('Y')."
-            ; 
+            WHERE groups.col_id = ".$_SESSION['college_id']." ";
 
-        ";
+            if($otherQuery != null){
+                $sql .= $otherQuery;
+            }else{
+                $sql .= " 
+                AND YEAR(member_in.issue_date) = ".date('Y')." ";
+            }
+
         break;
-        case 'out': $sql = "";
+        case 'out': $sql = "
+            SELECT 
+            CONCAT(member.firstname, ' ', member.lastname) AS fullname,
+            DATE_FORMAT(member_out.issue_date, '%d/%m/%Y') AS i_d,
+            member_out.doc_no,
+            member_out.latest_paid_year,
+            groups.group_name,
+            member.gender,
+            member.role
+            FROM member
+            JOIN groups ON groups.id = member.group_id 
+            JOIN member_out ON member_out.mem_id = member.mem_id 
+            WHERE groups.col_id = ".$_SESSION['college_id']." ";
+
+            if($otherQuery != null){
+                $sql .= $otherQuery;
+            }else{
+                $sql .= " 
+                AND YEAR(member_out.issue_date) = ".date('Y')."
+                ;";
+            }
         break;
-        case 'activity': $sql = "";
+        case 'activity': $sql = "
+            SELECT 
+            activity.*,
+            DATE_FORMAT(act_date,'%d/%m/%Y') AS a_d 
+            FROM activity 
+            WHERE activity.col_id = ".$_SESSION['college_id']." ";
+            
+            if($otherQuery != null){
+                $sql .= $otherQuery;
+            }else{
+                $sql .= "
+                    AND YEAR(act_date) = ".date('Y')."
+                    ";
+            }
         break;
     }
+    
     return $sql;
+}
+
+function getReportAllQuery($page, $otherQuery=null){
+    $sql = '';
+    switch($page){
+        case 'college': $sql = "
+            SELECT 
+            college.col_name, 
+            college.tel, 
+            college.email, 
+            CONCAT(college.col_village,', ',college.col_district,', ',college.col_province) AS col_address, 
+            (SELECT CONCAT(member.firstname, ' ', member.lastname) FROM member WHERE member.mem_id = college.local_president ) AS president,
+            (SELECT COUNT(member.gender) from member JOIN groups ON groups.id = member.group_id WHERE groups.col_id = college.col_id AND member.status != 2) AS total_member, 
+            (SELECT COUNT(member.gender) from member JOIN groups ON groups.id = member.group_id WHERE groups.col_id = college.col_id AND member.gender = 'ຍິງ' AND member.status != 2) AS female_member 
+            from college
+            ORDER BY total_member DESC;
+            ";
+        break;
+        case 'member': $sql = "
+            SELECT
+            (SELECT college.col_name FROM college WHERE college.col_id = groups.col_id) AS col_name,
+            COUNT(gender) AS all_member,
+            COUNT(CASE WHEN gender = 'ຍິງ' THEN 1 END) AS female,
+            COUNT(CASE WHEN role = 3 THEN 1 END) AS student,
+            COUNT(CASE WHEN role = 3 AND gender = 'ຍິງ' THEN 1 END) AS student_female
+            FROM member 
+            JOIN groups ON groups.id = member.group_id
+            ";
+
+            if($otherQuery != null){
+                $sql .= $otherQuery;
+            }else{
+                $sql .= " 
+                WHERE YEAR (join_local) = '".date('Y')."'
+                ";
+            }
+
+            $sql .= "
+                GROUP BY groups.col_id
+                ORDER BY groups.col_id;
+            ";
+        break;
+        case 'fee': $sql = "
+            SELECT 
+            (SELECT college.col_name FROM college WHERE college.col_id = groups.col_id) AS col_name,
+            COUNT(member.mem_id) AS all_member,
+            COUNT(CASE WHEN gender = 'ຍິງ' THEN 1 END) AS female,
+            COUNT(CASE WHEN role <> 3 THEN 1 END) AS committee,
+            COUNT(CASE WHEN role <> 3 AND gender = 'ຍິງ' THEN 1 END) AS committee_female,
+            COUNT(CASE WHEN role = 3 THEN 1 END) AS student,
+            COUNT(CASE WHEN role = 3 AND gender = 'ຍິງ' THEN 1 END) AS student_female,
+            (SELECT COUNT(member.mem_id) FROM member JOIN groups ON groups.id = member.group_id WHERE groups.col_id = 1) - 
+            COUNT(member.mem_id) AS not_pay
+            FROM member
+            LEFT JOIN membership_fee ON membership_fee.mem_id = member.mem_id
+            LEFT JOIN groups ON  groups.id = member.group_id
+            
+            ";
+
+                if($otherQuery != null){
+                    $sql .= $otherQuery;
+                }else{
+                    $sql .= " 
+                    WHERE YEAR(membership_fee.pay_date) = '".date('Y')."'
+                    ";
+                }
+
+            $sql .="
+                GROUP BY groups.col_id
+                ORDER BY groups.col_id;
+            ";
+        break;
+        case 'in': $sql = "
+            SELECT (SELECT college.col_name FROM college WHERE college.col_id = member_in.col_id) AS col_name,
+            COUNT(gender) AS all_member,
+            COUNT(CASE WHEN gender = 'ຍິງ' THEN 1 END) AS female,
+            COUNT(CASE WHEN role <> 3 THEN 1 END) AS committee,
+            COUNT(CASE WHEN role <> 3 AND gender = 'ຍິງ' THEN 1 END) AS committee_female,
+            COUNT(CASE WHEN role = 3 THEN 1 END) AS student,
+            COUNT(CASE WHEN role = 3 AND gender = 'ຍິງ' THEN 1 END) AS student_female
+            FROM member
+            JOIN member_in ON member.mem_id = member_in.mem_id
+            ";
+
+                if($otherQuery != null){
+                    $sql .= $otherQuery;
+                }else{
+                    $sql .= " 
+                    WHERE YEAR(member_in.issue_date) = '".date('Y')."'
+                    ";
+                }
+
+            $sql .=" GROUP BY member_in.col_id; ";
+
+        break;
+        case 'out': $sql = "
+            SELECT (SELECT college.col_name FROM college WHERE college.col_id = member_out.col_id) AS col_name,
+            COUNT(gender) AS all_member,
+            COUNT(CASE WHEN gender = 'ຍິງ' THEN 1 END) AS female,
+            COUNT(CASE WHEN role <> 3 THEN 1 END) AS committee,
+            COUNT(CASE WHEN role <> 3 AND gender = 'ຍິງ' THEN 1 END) AS committee_female,
+            COUNT(CASE WHEN role = 3 THEN 1 END) AS student,
+            COUNT(CASE WHEN role = 3 AND gender = 'ຍິງ' THEN 1 END) AS student_female
+            FROM member
+            JOIN member_out ON member.mem_id = member_out.mem_id
+            ";
+
+                if($otherQuery != null){
+                    $sql .= $otherQuery;
+                }else{
+                    $sql .= " 
+                    WHERE YEAR(member_out.issue_date) = ".date('Y')."
+                    ";
+                }
+
+            $sql .=" GROUP BY member_out.col_id; ";
+        break;
+        case 'activity': $sql = "
+            SELECT 
+            activity.*,
+            DATE_FORMAT(act_date,'%d/%m/%Y') AS a_d ,
+            (SELECT col_name FROM college WHERE college.col_id = activity.col_id) AS col_name
+            FROM activity 
+            ";
+            
+            if($otherQuery != null){
+                $sql .= $otherQuery;
+            }else{
+                $sql .= "
+                    WHERE YEAR(act_date) = ".date('Y')."
+                    ";
+            }
+        break;
+    }
+    
+    return $sql;
+}
+
+function showQuarter(){
+    $str = '<div class="col-2">
+    <select name="quarter" class="form-control">
+        <option value="">ທຸກໄຕມາດ</option>
+        <option '.(@$_GET['quarter']==1?'selected':'').' value="1">ໄຕມາດ 1</option>
+        <option '.(@$_GET['quarter']==2?'selected':'').'  value="2">ໄຕມາດ 2</option>
+        <option '.(@$_GET['quarter']==3?'selected':'').'  value="3">ໄຕມາດ 3</option>
+        <option '.(@$_GET['quarter']==4?'selected':'').'  value="4">ໄຕມາດ 4</option>
+    </select>
+</div>';
+return $str;
 }

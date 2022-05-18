@@ -70,11 +70,21 @@ if ($_POST) {
 
             switch ($_POST['do']) {
                 case 'add':
-                    echo 'ADD';
+                    
                     $sql_insert = "INSERT INTO member_out (col_id, mem_id, doc_no, issue_date, latest_paid_year) VALUES(?,?,?,?,?)";
                     $data_insert = [$_SESSION['college_id'], $mem_id, $doc_no, $issue_date, $latest_year];
                     $rs_insert = prepared_stm($con, $sql_insert, $data_insert );
-                    
+                    if($rs_insert->errno == 1048){
+                        $message = '<script type="text/javascript">
+                            Swal.fire({
+                                title: "ຜິດພາດ",
+                                position: "top-center",
+                                icon: "warning",
+                                text: "ຜູ້ກ່ຽວຍັງບໍ່ທັນຊຳລະຄ່າສະຕິ",
+                                button: "ລອງໃໝ່",
+                            })
+                            </script>';
+                    }
                     if ($rs_insert->affected_rows == 1) {
                         $message = '<script type="text/javascript">
                             Swal.fire({
