@@ -7,7 +7,7 @@ $username = $url["user"];
 $password = $url["pass"];
 $db = substr($url["path"], 1);
 
-$conn = new mysqli($server, $username, $password, $db);
+$con = new mysqli($server, $username, $password, $db);
 
 // //ສ້າງການເຊື່ອມຕໍ່ຖານຂໍ້ມູນ
 // $con = new mysqli(DB_HOST,DB_USER,DB_PASSWORD,DB_NAME);
