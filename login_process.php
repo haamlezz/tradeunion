@@ -38,7 +38,7 @@ if ($_POST) {
 
             $_SESSION['error_msg'] = null;
 
-            if($row['role'] = 3){
+            if($row['role'] == 3){
                 header('Location:member_section.php');
             }else{
                 header('Location:index.php');
