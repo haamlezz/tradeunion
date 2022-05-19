@@ -440,14 +440,11 @@ return $str;
 
 function encrypt_decrypt($action, $string) 
     {
-        $output = false;
-        $encrypt_method = "AES-256-CBC";
-        $secret_key = 'LaoTopCollege';
-        $secret_iv = '5477269772039986';
 
-        // $encrypt_method = getenv('encrypt_method');
-        // $secret_key = getenv('secret_key');
-        // $secret_iv = getenv('secret_iv');
+
+        $encrypt_method = getenv('encrypt_method');
+        $secret_key = getenv('secret_key');
+        $secret_iv = getenv('secret_iv');
 
 
         // hash
