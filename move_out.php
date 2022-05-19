@@ -8,6 +8,7 @@ require_once __DIR__ . '/header.php';
 if (!islogin()) {
     header('Location:login.php');
 }
+if(isMember()) restrictPage();
 require_once __DIR__ . '/menu.php';
 
 ?>

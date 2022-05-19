@@ -7,6 +7,7 @@ require_once __DIR__ . '/include/function.php';
 require_once __DIR__ . '/include/dbconfig.php';
 require_once __DIR__ . '/header.php';
 if (!islogin()) {header('Location:login.php');}
+if(isMember()) restrictPage();
 require_once __DIR__ . '/menu.php';
 $page = $_GET['page'];
 ?>

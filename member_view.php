@@ -11,28 +11,40 @@ if ($_POST) {
     $member_id = $con->real_escape_string($_POST['member_id']);
     $sql = "SELECT member.*, date_format(join_trade_union_date, '%d/%m/%Y') AS jtd, date_format(join_party_date, '%d/%m/%Y') AS jpd,date_format(join_women_union_date, '%d/%m/%Y') AS jwd, col_name, group_name FROM member JOIN groups ON member.group_id = groups.id JOIN college ON groups.col_id = college.col_id WHERE mem_id = ? ";
     $rs = prepared_stm($con, $sql, [$member_id])->get_result();
-    $row = $rs->fetch_assoc();
-    $jpd = $row['jpd'];
-    if ($row['jpd'] == null) {
-        $jpd = 'ບໍ່ໄດ້ເປັນສະມາຊິກ';
-    }
+    if (mysqli_num_rows($rs) == 0) {
+        echo '<div class="alert alert-warning">
+        ກະລຸນາສ້າງຈຸ ແລະ ກຳນົດຈຸໃຫ້ຖືກຕ້ອງ
+        <br><br>
+        <a href="group.php">ໄປໜ້າສ້າງຈຸ</a><br><br>
+        <a href="member_add.php?member_id='.$member_id.'&#group">ໄປໜ້າກຳນົດຈຸ</a>
+        </div>';
+    } else {
 
-    $jwd = $row['jwd'];
-    if ($row['jwd'] == null) {
-        $jwd = 'ບໍ່ໄດ້ເປັນສະມາຊິກ';
-    }
-    $str = '
-        <h3>' . $row['firstname'] . ' ' . $row['lastname'] .'&nbsp;&nbsp;';
 
-        switch ($row['role']){
-            case 1: $str.= '<span class="badge bg-primary">ຄະນະບໍລິຫານ</span>';
-            break;
-            case 2: $str.= '<span class="badge bg-warning">ຮາກຖານ</span>';
+        $row = $rs->fetch_assoc();
+        $jpd = $row['jpd'];
+        if ($row['jpd'] == null) {
+            $jpd = 'ບໍ່ໄດ້ເປັນສະມາຊິກ';
         }
 
-    $str .='</h3>';
+        $jwd = $row['jwd'];
+        if ($row['jwd'] == null) {
+            $jwd = 'ບໍ່ໄດ້ເປັນສະມາຊິກ';
+        }
+        $str = '
+        <h3>' . $row['firstname'] . ' ' . $row['lastname'] . '&nbsp;&nbsp;';
 
-    $str .=    '<div class="row mt-3">
+        switch ($row['role']) {
+            case 1:
+                $str .= '<span class="badge bg-primary">ຄະນະບໍລິຫານ</span>';
+                break;
+            case 2:
+                $str .= '<span class="badge bg-warning">ຮາກຖານ</span>';
+        }
+
+        $str .= '</h3>';
+
+        $str .=    '<div class="row mt-3">
             <div class="col-4">
                 <i class="fas fa-map-marker"></i> ຮາກຖານ: <br/> <span class="h3">' . $row['col_name'] . '</span>
             </div>
@@ -107,30 +119,31 @@ if ($_POST) {
 
         
     ';
-    $sql = "SELECT *, date_format(issue_date, '%d/%m/%Y') AS i_date FROM member_in WHERE mem_id = ?";
-    $rs = prepared_stm($con, $sql, [$member_id])->get_result();
-    if($rs->num_rows != 0){
-        $row = $rs->fetch_assoc();
-        $str .= '
+        $sql = "SELECT *, date_format(issue_date, '%d/%m/%Y') AS i_date FROM member_in WHERE mem_id = ?";
+        $rs = prepared_stm($con, $sql, [$member_id])->get_result();
+        if ($rs->num_rows != 0) {
+            $row = $rs->fetch_assoc();
+            $str .= '
         <hr class="mb-3">
         <p>
                     <span class="text-secondary"><i class="fa-solid fa-circle-arrow-right text-success fa-2x"></i> &nbsp; ຍ້າຍເຂົ້າ: </span>
-                    <b>ວັນທີ '.$row['i_date'].'</b> &nbsp;
-                    (ເລກທີ '.$row['doc_no'].')
+                    <b>ວັນທີ ' . $row['i_date'] . '</b> &nbsp;
+                    (ເລກທີ ' . $row['doc_no'] . ')
                 </p>';
-    }
+        }
 
-    $sql = "SELECT *, date_format(issue_date, '%d/%m/%Y') AS i_date FROM member_out WHERE mem_id = ?";
-    $rs = prepared_stm($con, $sql, [$member_id])->get_result();
-    if($rs->num_rows != 0){
-        $row = $rs->fetch_assoc();
-        $str .= '
+        $sql = "SELECT *, date_format(issue_date, '%d/%m/%Y') AS i_date FROM member_out WHERE mem_id = ?";
+        $rs = prepared_stm($con, $sql, [$member_id])->get_result();
+        if ($rs->num_rows != 0) {
+            $row = $rs->fetch_assoc();
+            $str .= '
         <p>
                     <span class="text-secondary"><i class="fa-solid fa-circle-arrow-left text-danger fa-lg"></i> &nbsp; ຍ້າຍອອກ: </span>
-                    <b>ວັນທີ '.$row['i_date'].'</b> &nbsp;
-                    (ເລກທີ '.$row['doc_no'].')
+                    <b>ວັນທີ ' . $row['i_date'] . '</b> &nbsp;
+                    (ເລກທີ ' . $row['doc_no'] . ')
                 </p>';
-    }
+        }
 
-    echo $str;
+        echo $str;
+    }
 }

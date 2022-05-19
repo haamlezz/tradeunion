@@ -5,7 +5,9 @@ require_once __DIR__ . '/include/define.php';
 require_once __DIR__ . '/include/function.php';
 require_once __DIR__ . '/include/dbconfig.php';
 require_once __DIR__ . '/header.php';
-if (!islogin()) {header('Location:login.php');}
+if (!islogin()) {
+    header('Location:login.php');
+}
 require_once __DIR__ . '/menu.php';
 ?>
 
@@ -15,6 +17,19 @@ require_once __DIR__ . '/menu.php';
     <?php if (isAdmin() || isCommittee()) : ?>
         <div class="mt-3" style="margin-bottom: 30px;">
             <a href="member_add.php" class="btn btn-primary">ເພີ່ມສະມາຊິກໃໝ່</a>
+
+            <?php
+                $sql = "SELECT col_name FROM college WHERE col_id = ".$_SESSION['college_id'];
+                $rs = $con->query($sql);
+                $row = $rs->fetch_assoc();
+                $col_name_enc = encrypt_decrypt('encrypt',$row['col_name']);
+            ?>
+
+            <!-- The text field -->
+            <input type="hidden" value="<?= $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']) . '/member_register.php?c=' . encrypt_decrypt('encrypt', $_SESSION['college_id']).'&n='.$col_name_enc ?>" id="myInput">
+
+            <!-- The button used to copy the text -->
+            <button onclick="myFunction()" class="btn btn-link">ກ໊ອບປີ້ລິ້ງລົງທະບຽນ</button>
         </div>
     <?php endif; ?>
 
@@ -31,42 +46,70 @@ require_once __DIR__ . '/menu.php';
         </thead>
         <tbody>
             <?php
-            $sql = "SELECT mem_id, firstname, lastname, gender, username, role, (SELECT groups.group_name FROM groups WHERE groups.id = member.group_id) AS g_name, status FROM member JOIN groups ON groups.id = member.group_id WHERE groups.col_id = ". $_SESSION['college_id'].";";
-        
+            $sql = "SELECT 
+                    mem_id, 
+                    firstname, 
+                    lastname, 
+                    gender, 
+                    username, 
+                    role, 
+                    (SELECT groups.group_name FROM groups WHERE groups.id = member.group_id) AS g_name, 
+                    (SELECT col_name FROM college WHERE college.col_id = member.col_id) AS c_name,
+                    member.status 
+                    FROM member 
+                    ";
+
+            if ($_SESSION['role'] == 1) {
+                $sql .= " WHERE member.role <> 3 ;";
+            } else {
+                $sql .= " WHERE member.col_id = " . $_SESSION['college_id'] . " ; ";
+            }
+
+
             $rs = $con->query($sql);
             echo $con->error;
-            while ( $row = $rs->fetch_assoc() ) {
+            while ($row = $rs->fetch_assoc()) {
                 echo '
                     <tr>
                         <td>' . $row['mem_id'] . '</td>
-                        <td>' 
-                        . $row['firstname'] . ' ' .$row['lastname']. 
-                        ' &nbsp; &nbsp; ';
+                        <td>'
+                    . $row['firstname'] . ' ' . $row['lastname'] .
+                    ' &nbsp; &nbsp; ';
 
-                        switch ($row['role']){
-                            case 1: echo '<span class="badge bg-primary">ຄະນະບໍລິຫານ</span>';
-                            break;
-                            case 2: echo '<span class="badge bg-warning">ຮາກຖານ</span>';
-                        }
+                switch ($row['role']) {
+                    case 1:
+                        echo '<span class="badge bg-primary">ຄະນະບໍລິຫານ</span>';
+                        break;
+                    case 2:
+                        echo '<span class="badge bg-warning">ຮາກຖານ</span>';
+                }
+                if ($_SESSION['role'] == 1) {
+                    echo '<br>
+                                <small class="text-secondary">' . $row['c_name'] . '</small>
+                            ';
+                }
                 echo   '</td>
                         <td>' . $row['gender'] . '</td>
-                        <td>' . $row['g_name'] . '</td>
+                        <td>' . ($row['g_name'] == NULL ? 'ຍັງບໍ່ທັນເຂົ້າຈຸ' : $row['g_name']) . '</td>
                         <td>
                             <button onclick="getMember(' . $row['mem_id'] . ')" type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModal">
                                 ສະແດງ
                             </button>';
-                
+
+                if ($row['role'] != 1 || $_SESSION['role'] == 1) {
                     echo '                
                             <a href="member_add.php?member_id=' . $row['mem_id'] . '" class="btn btn-success btn-sm">ແກ້ໄຂ</a>
                     ';
-                    if( $row['username']!=$_SESSION['username']){
-                        if($row['role'] != 1 || isAdmin()){
-                            echo '<a onclick="deleteMember(' . $row['mem_id'] . ')" href="#" class="btn btn-danger btn-sm">ລົບ</a>';
-                        }
-                    }
-                    
+                }
 
-                    //<a onclick="deleteMember(' . $row['mem_id'] . ')" href="#" class="btn btn-danger btn-sm">ລົບ</a>
+
+                if ($row['username'] != $_SESSION['username']) {
+                    if ($row['role'] != 1 || isAdmin()) {
+                        echo ' <a onclick="deleteMember(' . $row['mem_id'] . ')" href="#" class="btn btn-danger btn-sm">ລົບ</a>';
+                    }
+                }
+
+                //<a onclick="deleteMember(' . $row['mem_id'] . ')" href="#" class="btn btn-danger btn-sm">ລົບ</a>
 
                 echo '</td>
                 </tr>';
@@ -150,32 +193,50 @@ require __DIR__ . '/footer.php';
                         member_id: member_id
                     },
                     success: function(data) {
-                        if(data == 1){
+                        if (data == 1) {
                             Swal.fire("ບໍ່ສຳເລັດ", "ທ່ານບໍ່ສາມາດລຶບຂໍ້ມູນທ່ານເອງໄດ້", "success", {
                                 icon: "warning",
-                                position: "top-center", 
+                                position: "top-center",
                                 button: "ຕົກລົງ",
-                        });
-                    }else if(data == 2){
-                        Swal.fire("ບໍ່ສຳເລັດ", "ທ່ານບໍ່ສາມາດລຶບຂໍ້ມູນທ່ານເອງໄດ້", "success", {
+                            });
+                        } else if (data == 2) {
+                            Swal.fire("ບໍ່ສຳເລັດ", "ທ່ານບໍ່ສາມາດລຶບຂໍ້ມູນທ່ານເອງໄດ້", "success", {
                                 icon: "warning",
-                                position: "top-center", 
+                                position: "top-center",
                                 button: "ຕົກລົງ",
-                        });
-                    }else{
-                        Swal.fire("ສໍາເລັດ", "ຂໍ້ມູນຖືກລືບອອກຈາກຖານຂໍ້ມູນແລ້ວ", "success", {
-                            button: "ຕົກລົງ",
-                        }).then(()=>{
-                            location.reload();
-                        });
-                    }
-                        
+                            });
+                        } else {
+                            Swal.fire("ສໍາເລັດ", "ຂໍ້ມູນຖືກລືບອອກຈາກຖານຂໍ້ມູນແລ້ວ", "success", {
+                                button: "ຕົກລົງ",
+                            }).then(() => {
+                                location.reload();
+                            });
+                        }
+
                     }
                 });
             }
         });
-
-
-
     }
+
+
+function myFunction() {
+
+
+  /* Get the text field */
+  var copyText = document.getElementById("myInput");
+
+  /* Select the text field */
+//   copyText.focus()
+//   copyText.select();
+//   copyText.setSelectionRange(0, 99999); /* For mobile devices */
+
+   /* Copy the text inside the text field */
+  navigator.clipboard.writeText(copyText.value).then(()=>{
+    alert("ກ໊ອບປີ້ລິ້ງສຳເລັດ ສົ່ງຕໍ່ໃຫ້ສະມາຊິກໄດ້");
+  });
+
+  /* Alert the copied text */
+  //
+}
 </script>

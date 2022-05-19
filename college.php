@@ -140,10 +140,9 @@ require __DIR__ . '/footer.php';
 
                         Swal.fire("ສໍາເລັດ", "ຂໍ້ມູນຖືກລືບອອກຈາກຖານຂໍ້ມູນແລ້ວ", "success", {
                             button: "ຕົກລົງ",
-                        });
-                        setTimeout(function() {
+                        }).then((data)=>{
                             location.reload();
-                        }, 2000); //2000 = 2ວິນາທີ
+                        });
                     }
                 });
             }

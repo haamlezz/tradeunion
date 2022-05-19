@@ -86,8 +86,8 @@
         </li>
 
       </ul>
-      <form class="d-flex">
-        <input class="form-control me-2" type="search" placeholder="ຄົ້ນຫາ..." aria-label="Search">
+      <form class="d-flex" action="search.php" method="get">
+        <input class="form-control me-2" type="search" placeholder="ຄົ້ນຫາສະມາຊິກ..." name="search" aria-label="Search">
         <button class="btn btn-success" type="submit">ຄົ້ນຫາ</button>
       </form>
     </div>

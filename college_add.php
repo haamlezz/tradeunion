@@ -65,14 +65,14 @@ if ($_POST) {
             </script>';
         }
     } else if ($_POST['do'] == 'edit') {
-        print_r($_POST);
+        
         $college_id   = $con->real_escape_string($_POST['college_id']);
         $local_president = $con->real_escape_string($_POST['president']);
         $data = [$college_name, $college_tel, $college_email, $college_village, $college_district, $college_province, $local_president, $college_id];
         $sql = "UPDATE college SET col_name=?,tel=?, email=?, col_village=?, col_district=?, col_province=?, local_president=? WHERE col_id=? ";
         $rs = prepared_stm($con, $sql, $data, 'ssssssii');
-        print_r($rs);
-        if($rs->affected_rows == 1){
+        
+        if($rs->affected_rows >= 0){
             $message = '<script type="text/javascript">
             Swal.fire({
                         title:"ສຳເລັດ",
@@ -169,7 +169,7 @@ echo @$message;
             <div class="col-md-8">
                 <div class="form-group">
                         <?php
-                            $sql = "SELECT member.mem_id, CONCAT(member.firstname,' ',member.lastname) AS fullname FROM member JOIN groups ON groups.id = member.group_id WHERE groups.col_id = ? AND member.role = 2";
+                            $sql = "SELECT member.mem_id, CONCAT(member.firstname,' ',member.lastname) AS fullname FROM member WHERE member.col_id = ? AND member.role <> 3";
                             $rs = prepared_stm($con, $sql, [@$_GET['college_id']])->get_result() ;
                             if($rs->num_rows == 0){
                                 echo 'ຍັງບໍ່ທັນມີສະມາຊິກ';

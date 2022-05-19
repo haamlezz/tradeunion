@@ -19,12 +19,13 @@ require __DIR__ . '/menu.php';
             <form action="" method="post">
                 <div class="form-group mt-3">
                     <label for="groupId">ລະຫັດ</label>
-                    <input readonly type="text" class="form-control" name="id" value="" id="groupId">
+                    <input readonly type="text" class="form-control" name="id" value="" id="groupId" placeholder="ລະຫັດຈຸ (ບໍ່ຈຳເປັນປ້ອນ)">
                 </div>
                 <div class="form-group mt-3 mb-3">
                     <label for="groupName">ຊື່ຈຸ</label>
-                    <input required type="text" name="groupName" id="groupName" class="form-control">
+                    <input required type="text" name="groupName" id="groupName" class="form-control" placeholder="ປ້ອນຊື່ຈຸ" value="">
                 </div>
+
                 <input type="hidden" name="do" value="add" id="doAction">
                 <button disabled="" id="btnAction" type="button" class="btn btn-primary" onclick="doProcess()">ບັນທຶກ</button>
                 <button id="btnCancel" type="button" class="btn btn-warning d-none" onclick="doCancel()">ຍົກເລີກ</button>
@@ -42,16 +43,19 @@ require __DIR__ . '/menu.php';
                 </thead>
                 <tbody>
                     <?php
-                    $sql = "SELECT groups.id, groups.group_name, (select count(*) from member where member.group_id = groups.id) as num_member from groups where col_id = " . $_SESSION['college_id'] . " ORDER BY groups.group_name;";
+                    $sql = "SELECT 
+                            (SELECT college.col_name FROM college WHERE college.col_id = groups.col_id) AS c_name,
+                            groups.id, 
+                            groups.group_name, 
+                            (select count(*) FROM member WHERE member.group_id = groups.id) AS num_member 
+                            FROM groups  WHERE col_id = " . $_SESSION['college_id'];
+                        
                     $rs = mysqli_query($con, $sql);
                     while ($row = $rs->fetch_assoc()) {
                         $str = '
                                 <tr>
                                     <td>' . $row['id'] . '</td>
-                                    <td>' . $row['group_name'];
-
-
-                        $str .= '</td>
+                                    <td>' . $row['group_name'].'</td>
                                     <td>' . $row['num_member'] . '</td>
                                     <td>
                                         <button onclick="getMembers(' . $row['id'] . ')" type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModal">
