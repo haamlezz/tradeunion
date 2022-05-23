@@ -297,7 +297,7 @@ function getReportAllQuery($page, $otherQuery=null){
             college.tel, 
             college.email, 
             CONCAT(college.col_village,', ',college.col_district,', ',college.col_province) AS col_address, 
-            (SELECT CONCAT(member.firstname, ' ', member.lastname) FROM member WHERE member.mem_id = college.local_president ) AS president,
+            
             (SELECT COUNT(member.gender) from member JOIN groups ON groups.id = member.group_id WHERE groups.col_id = college.col_id AND member.status != 2) AS total_member, 
             (SELECT COUNT(member.gender) from member JOIN groups ON groups.id = member.group_id WHERE groups.col_id = college.col_id AND member.gender = 'ຍິງ' AND member.status != 2) AS female_member 
             from college
@@ -441,13 +441,13 @@ return $str;
 function encrypt_decrypt($action, $string) 
     {
         $output = false;
-        // $encrypt_method = "AES-256-CBC";
-        // $secret_key = 'LaoTopCollege';
-        // $secret_iv = '5477269772039986';
+        $encrypt_method = "AES-256-CBC";
+        $secret_key = 'LaoTopCollege';
+        $secret_iv = '5477269772039986';
 
-        $encrypt_method = getenv('encrypt_method');
-        $secret_key = getenv('secret_key');
-        $secret_iv = getenv('secret_iv');
+        // $encrypt_method = getenv('encrypt_method');
+        // $secret_key = getenv('secret_key');
+        // $secret_iv = getenv('secret_iv');
 
 
         // hash

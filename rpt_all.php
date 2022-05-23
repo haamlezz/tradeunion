@@ -69,7 +69,7 @@ $page = $_GET['page'];
                     <tr>
                         <th>ລຳດັບ</th>
                         <th>ຮາກຖານ</th>
-                        <th>ປະທານ ກມບ ຮາກຖານ</th>
+                        
                         <th>ສະມາຊິກກຳມະບານ</th>
                         <th>ທີ່ຢູ່ ຕິດຕໍ່</th>
                     </tr>
@@ -81,7 +81,7 @@ $page = $_GET['page'];
                     <tr>
                         <td>'.$count++.'</td>
                         <td>'.$row['col_name'].'</td>
-                        <td>'.$row['president'].'<td>
+                        <td>
                             ທັງໝົດ: '.$row['total_member'].' ສະຫາຍ
                             <br>
                             ເປັນຍິງ: '.$row['female_member'].'ສະຫາຍ

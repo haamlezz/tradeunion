@@ -67,7 +67,8 @@ if ($_POST) {
     } else if ($_POST['do'] == 'edit') {
         
         $college_id   = $con->real_escape_string($_POST['college_id']);
-        $local_president = $con->real_escape_string($_POST['president']);
+        // $local_president = $con->real_escape_string($_POST['president']);
+        $local_president = '';
         $data = [$college_name, $college_tel, $college_email, $college_village, $college_district, $college_province, $local_president, $college_id];
         $sql = "UPDATE college SET col_name=?,tel=?, email=?, col_village=?, col_district=?, col_province=?, local_president=? WHERE col_id=? ";
         $rs = prepared_stm($con, $sql, $data, 'ssssssii');
@@ -104,7 +105,7 @@ if ($_GET) {
         $college_village     = $row['col_village'];
         $college_district    = $row['col_district'];
         $college_province    = $row['col_province'];
-        $local_president     = $row['local_president'];
+        // $local_president     = $row['local_president'];
 }
 
 echo @$message;
@@ -161,36 +162,36 @@ echo @$message;
 
         <hr class="mt-3 mb-3">
 
-        <div class="row mb-3">
-            <div class="col-md-4">
+        <!-- <div class="row mb-3"> -->
+            <!-- <div class="col-md-4">
                 <h4 class="text-secondary">ປະທານກຳມະບານຮາກຖານ</h4>
-            </div>
+            </div> -->
 
-            <div class="col-md-8">
+            <!-- <div class="col-md-8">
                 <div class="form-group">
                         <?php
-                            $sql = "SELECT member.mem_id, CONCAT(member.firstname,' ',member.lastname) AS fullname FROM member WHERE member.col_id = ? AND member.role <> 3";
-                            $rs = prepared_stm($con, $sql, [@$_GET['college_id']])->get_result() ;
-                            if($rs->num_rows == 0){
-                                echo 'ຍັງບໍ່ທັນມີສະມາຊິກ';
-                            }else{
-                                echo '<label for="presedent">ປະທານ</label>';
-                                echo '<select name="president" id="president" class="form-control">';
-                                echo '<option value="">ເລືອກປະທານຮາກຖານ</option>';
-                                while($row = $rs->fetch_assoc()){
-                                    echo '
-                                        <option '.($local_president==$row['mem_id']?'selected':'').' value="'.$row['mem_id'].'">'.$row['fullname'].'</option>
-                                    ';
-                                }
+                            // $sql = "SELECT member.mem_id, CONCAT(member.firstname,' ',member.lastname) AS fullname FROM member WHERE member.col_id = ? AND member.role <> 3";
+                            // $rs = prepared_stm($con, $sql, [@$_GET['college_id']])->get_result() ;
+                            // if($rs->num_rows == 0){
+                            //     echo 'ຍັງບໍ່ທັນມີສະມາຊິກ';
+                            // }else{
+                            //     echo '<label for="presedent">ປະທານ</label>';
+                            //     echo '<select name="president" id="president" class="form-control">';
+                            //     echo '<option value="">ເລືອກປະທານຮາກຖານ</option>';
+                            //     while($row = $rs->fetch_assoc()){
+                            //         echo '
+                            //             <option '.($local_president==$row['mem_id']?'selected':'').' value="'.$row['mem_id'].'">'.$row['fullname'].'</option>
+                            //         ';
+                            //     }
 
-                                echo '</select>';
-                            }
+                            //     echo '</select>';
+                            // }
                         ?>
                     
                     
                 </div>
-            </div>
-        </div>
+            </div> -->
+        <!-- </div> -->
         <?php
         if (isset($_GET['college_id'])) {
             echo '<input type="hidden" name="college_id" value="' . $_GET['college_id'] . '">';

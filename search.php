@@ -22,7 +22,17 @@ if($_GET):
 
         $search = mysqli_real_escape_string($con, $_GET['search']);
 
-        $sql = "SELECT member.mem_id, member.username, CONCAT(member.firstname,' ', member.lastname) AS fullname, (SELECT group_name FROM groups WHERE groups.id = member.group_id) AS g_name FROM member WHERE (member.firstname LIKE '".$search."%' OR member.lastname LIKE '".$search."%' OR member.username LIKE '".$search."%') AND member.col_id = ".$_SESSION['college_id'];
+        $sql = "SELECT 
+                member.mem_id, 
+                member.username, 
+                CONCAT(member.firstname,' ', member.lastname) AS fullname, 
+                (SELECT group_name FROM groups WHERE groups.id = member.group_id) AS g_name 
+                FROM member 
+                WHERE (member.firstname LIKE '".$search."%' OR member.lastname LIKE '".$search."%' OR member.username LIKE '".$search."%')
+                ";
+        if(isCommittee()){
+            $sql .= " AND (member.col_id = ".$_SESSION['college_id'] . ") ";
+        }
         
         $rs = $con->query($sql);
 

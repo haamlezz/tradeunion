@@ -15,7 +15,7 @@ if ($_POST) {
     $sql = "SELECT username, member.role, group_id, member.password, member.status, member.col_id FROM member WHERE username = '$username'";
     
     $rs = $con->query($sql);
-    echo $con->error;
+    
     if ($rs->num_rows == 0) {
         $_SESSION['error_msg'] = '<div class="alert alert-danger">ຊື່ບັນຊີ ຫຼື ລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ, ກະລຸນາລອງໃໝ່ອີກຄັ້ງ</div>';
         header('Location:login.php');
