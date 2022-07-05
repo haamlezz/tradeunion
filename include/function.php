@@ -307,7 +307,7 @@ function getReportAllQuery($page, $otherQuery=null){
         case 'member': $sql = "
             SELECT
             (SELECT college.col_name FROM college WHERE college.col_id = groups.col_id) AS col_name,
-            COUNT(gender) AS all_member,
+            COUNT(mem_id) AS all_member,
             COUNT(CASE WHEN gender = 'ຍິງ' THEN 1 END) AS female,
             COUNT(CASE WHEN role = 3 THEN 1 END) AS student,
             COUNT(CASE WHEN role = 3 AND gender = 'ຍິງ' THEN 1 END) AS student_female
@@ -319,7 +319,7 @@ function getReportAllQuery($page, $otherQuery=null){
                 $sql .= $otherQuery;
             }else{
                 $sql .= " 
-                WHERE YEAR (join_local) = '".date('Y')."'
+                WHERE (YEAR(join_local) <= ". date('Y') ." AND member.status = 1 )
                 ";
             }
 
@@ -349,7 +349,7 @@ function getReportAllQuery($page, $otherQuery=null){
                     $sql .= $otherQuery;
                 }else{
                     $sql .= " 
-                    WHERE YEAR(membership_fee.pay_date) = '".date('Y')."'
+                    WHERE YEAR(membership_fee.pay_date) <= '".date('Y')."'
                     ";
                 }
 
@@ -374,7 +374,7 @@ function getReportAllQuery($page, $otherQuery=null){
                     $sql .= $otherQuery;
                 }else{
                     $sql .= " 
-                    WHERE YEAR(member_in.issue_date) = '".date('Y')."'
+                    WHERE YEAR(member_in.issue_date) <= '".date('Y')."'
                     ";
                 }
 
@@ -397,7 +397,7 @@ function getReportAllQuery($page, $otherQuery=null){
                     $sql .= $otherQuery;
                 }else{
                     $sql .= " 
-                    WHERE YEAR(member_out.issue_date) = ".date('Y')."
+                    WHERE YEAR(member_out.issue_date) <= ".date('Y')."
                     ";
                 }
 
@@ -415,7 +415,7 @@ function getReportAllQuery($page, $otherQuery=null){
                 $sql .= $otherQuery;
             }else{
                 $sql .= "
-                    WHERE YEAR(act_date) = ".date('Y')."
+                    WHERE YEAR(act_date) <= ".date('Y')."
                     ";
             }
         break;

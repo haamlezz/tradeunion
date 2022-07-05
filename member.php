@@ -53,16 +53,30 @@ require_once __DIR__ . '/menu.php';
                     gender, 
                     username, 
                     role, 
+                    status,
                     (SELECT groups.group_name FROM groups WHERE groups.id = member.group_id) AS g_name, 
                     (SELECT col_name FROM college WHERE college.col_id = member.col_id) AS c_name,
                     member.status 
                     FROM member 
+                    WHERE member.col_id = " . $_SESSION['college_id'] . " ;
                     ";
 
             if ($_SESSION['role'] == 1) {
-                $sql .= " WHERE member.role <> 3 ;";
-            } else {
-                $sql .= " WHERE member.col_id = " . $_SESSION['college_id'] . " ; ";
+                $sql = "SELECT 
+                    mem_id, 
+                    firstname, 
+                    lastname, 
+                    gender, 
+                    username, 
+                    role, 
+                    status,
+                    (SELECT groups.group_name FROM groups WHERE groups.id = member.group_id) AS g_name, 
+                    (SELECT col_name FROM college WHERE college.col_id = member.col_id) AS c_name,
+                    member.status 
+                    FROM member 
+                    WHERE member.role <> 3;
+                    ;
+                    ";
             }
 
 
@@ -83,6 +97,9 @@ require_once __DIR__ . '/menu.php';
                     case 2:
                         echo '<span class="badge bg-warning">ຮາກຖານ</span>';
                 }
+
+                if($row['status']==2){echo '<span class="badge bg-info">ຍ້າຍອອກແລ້ວ</span>';}
+
                 if ($_SESSION['role'] == 1) {
                     echo '<br>
                                 <small class="text-secondary">' . $row['c_name'] . '</small>
@@ -193,6 +210,7 @@ require __DIR__ . '/footer.php';
                         member_id: member_id
                     },
                     success: function(data) {
+                        console.log(data);
                         if (data == 1) {
                             Swal.fire("ບໍ່ສຳເລັດ", "ທ່ານບໍ່ສາມາດລຶບຂໍ້ມູນທ່ານເອງໄດ້", "success", {
                                 icon: "warning",
@@ -205,11 +223,11 @@ require __DIR__ . '/footer.php';
                                 position: "top-center",
                                 button: "ຕົກລົງ",
                             });
-                        } else {
+                        } else if(data == 3) {
                             Swal.fire("ສໍາເລັດ", "ຂໍ້ມູນຖືກລືບອອກຈາກຖານຂໍ້ມູນແລ້ວ", "success", {
                                 button: "ຕົກລົງ",
                             }).then(() => {
-                                location.reload();
+                               location.reload();
                             });
                         }
 

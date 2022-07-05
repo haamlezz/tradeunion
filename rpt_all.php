@@ -114,13 +114,15 @@ $page = $_GET['page'];
         $y_rs = mysqli_query($con, $sql);
         echo '<div class="col-1"><label class="col-form-label" for="year">ເລືອກປີ</label></div>';
         echo '<div class="col-2"><select class="form-control" id="year" name="year">';
+        
         while($row = mysqli_fetch_assoc($y_rs)){
             echo '<option '.($row['y']==@$_GET['year']?'selected':'').' value="'.$row['y'].'">'.$row['y'].'</option>';
         }
         echo '</select></div>
         '.showQuarter().'
             <input type="hidden" name="page" value="'.$page.'"/>
-            <div class="col-2"><input type="submit" value="ສະແດງຜົນ" class="btn btn-outline-success"></div>
+            <div class="col-1"><input type="submit" value="ສະແດງຜົນ" class="btn btn-outline-success"></div>
+            <div class="col-1"><a href="rpt_all.php?page=member" class="btn btn-outline-danger">ລ້າງຄ່າ</a></div>
         </div></form>';
         $year = null ;
         $quarter = null;
@@ -213,7 +215,8 @@ $page = $_GET['page'];
         echo '</select></div>
         '.showQuarter().'
             <input type="hidden" name="page" value="'.$page.'"/>
-            <div class="col-2"><input type="submit" value="ສະແດງຜົນ" class="btn btn-outline-success"></div>
+            <div class="col-1"><input type="submit" value="ສະແດງຜົນ" class="btn btn-outline-success"></div>
+            <div class="col-1"><a href="rpt_all.php?page=fee" class="btn btn-outline-danger">ລ້າງຄ່າ</a></div>
         </div></form>';
         $year = null ;
         $quarter = null;
@@ -313,7 +316,8 @@ $page = $_GET['page'];
         echo '</select></div>
         '.showQuarter().'
             <input type="hidden" name="page" value="'.$page.'"/>
-            <div class="col-2"><input type="submit" value="ສະແດງຜົນ" class="btn btn-outline-success"></div>
+            <div class="col-1"><input type="submit" value="ສະແດງຜົນ" class="btn btn-outline-success"></div>
+            <div class="col-1"><a href="rpt_all.php?page=in" class="btn btn-outline-danger">ລ້າງຄ່າ</a></div>
         </div></form>';
         $year = null ;
         $quarter = null;
@@ -409,7 +413,8 @@ $page = $_GET['page'];
         echo '</select></div>
         '.showQuarter().'
             <input type="hidden" name="page" value="'.$page.'"/>
-            <div class="col-2"><input type="submit" value="ສະແດງຜົນ" class="btn btn-outline-success"></div>
+            <div class="col-1"><input type="submit" value="ສະແດງຜົນ" class="btn btn-outline-success"></div>
+            <div class="col-1"><a href="rpt_all.php?page=out" class="btn btn-outline-danger">ລ້າງຄ່າ</a></div>
         </div></form>';
         $year = null ;
         $quarter = null;
@@ -507,7 +512,8 @@ $page = $_GET['page'];
         </div>
             '.showQuarter().'
             <input type="hidden" name="page" value="'.$page.'"/>
-            <div class="col-2"><input type="submit" value="ສະແດງຜົນ" class="btn btn-outline-success"></div>
+            <div class="col-1"><input type="submit" value="ສະແດງຜົນ" class="btn btn-outline-success"></div>
+            <div class="col-1"><a href="rpt_all.php?page=activity" class="btn btn-outline-danger">ລ້າງຄ່າ</a></div>
         </div></form>';
         $year = null ;
         $quarter = null;

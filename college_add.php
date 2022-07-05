@@ -133,7 +133,7 @@ echo @$message;
             <div class="col-md-3">
                 <div class="form-group">
                     <label for="collegeEmail">ອີເມລ</label>
-                    <input value="<?= @$college_email ?>" required id="collegeEmail" type="email" class="form-control" name="college_email" placeholder="ປ້ອນອີເມລ">
+                    <input value="<?= @$college_email ?>" id="collegeEmail" type="email" class="form-control" name="college_email" placeholder="ປ້ອນອີເມລ">
                 </div>
             </div>
         </div>

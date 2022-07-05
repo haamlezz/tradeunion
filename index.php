@@ -23,9 +23,15 @@ require_once __DIR__ . '/menu.php';
     
         <?php
             $sql="SELECT id AS c_g FROM groups WHERE col_id = ".$_SESSION['college_id'];
-            $rs = $con->query($sql);
+            $rs = $con->query($sql);            
             if($rs->num_rows == 0){
                 echo '<div class="alert alert-danger">ຮາກຖານນີ້ຍັງບໍ່ທັນມີຈຸ <a href="group.php">ເພີ່ມຈຸ</a></div>';
+            }
+
+            $sql="SELECT group_id FROM member WHERE mem_id = ".$_SESSION['member_id'] ." AND group_id = 0";
+            $rs = $con->query($sql);            
+            if($rs->num_rows == 1){
+                echo '<div class="alert alert-danger">ຂໍ້ມູນທ່ານ <a href="member_add.php?member_id='. $_SESSION['member_id'] .'&#group">ກະລຸນາເລືອກຈຸສັງກັດ</a></div>';
             }
         ?>
     

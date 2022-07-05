@@ -86,6 +86,10 @@ if ($_POST) {
                             </script>';
                     }
                     if ($rs_insert->affected_rows == 1) {
+
+                        $sql = "UPDATE member SET member.status=2 WHERE mem_id=?";
+                        $rs = prepared_stm($con, $sql, [$mem_id]);
+
                         $message = '<script type="text/javascript">
                             Swal.fire({
                                         title:"ສຳເລັດ",
@@ -105,10 +109,6 @@ if ($_POST) {
                     $rs = prepared_stm($con, $sql, [$doc_no, $issue_date, $mem_id, $_POST['id']]);
                     
                     if ($rs->affected_rows == 1) {
-
-                        $sql = "UPDATE member SET member.status=2 WHERE mem_id=?";
-                        $rs = prepared_stm($con, $sql, [$mem_id]);
-
                         $message = '<script type="text/javascript">
                             Swal.fire({
                                         title:"ສຳເລັດ",

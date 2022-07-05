@@ -1,7 +1,7 @@
 <?php
 session_start();
 if($_GET || isset($_GET['page'])):
-$current_page = 'college';
+$current_page = 'report';
 require_once __DIR__ . '/include/define.php';
 require_once __DIR__ . '/include/function.php';
 require_once __DIR__ . '/include/dbconfig.php';
@@ -463,7 +463,7 @@ $page = $_GET['page'];
             $quarter = mysqli_real_escape_string($con, $_GET['quarter']);
             if($quarter == 1){
                 $otherSql = "
-                 AND MONTH(act_date) >= 1 OR MONTH(act_date) <= 3
+                 AND MONTH(act_date) >= 1 AND MONTH(act_date) <= 3
                 ";
             }else if($quarter == 2){
                 $otherSql = "

@@ -22,7 +22,7 @@ if($_POST){
         echo 2;
     } else {
         echo 3;
-        $sql = "DELETE FROM member WHERE id = ?";
-        $rs = prepared_stm($con, $sql, [$_POST['activity_id'], $_SESSION['college_id']]);
+        $sql = "DELETE FROM member WHERE mem_id = ?";
+        $rs = prepared_stm($con, $sql, [$_POST['member_id']]);
     }
 }

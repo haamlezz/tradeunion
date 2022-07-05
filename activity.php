@@ -37,7 +37,7 @@ require_once __DIR__ . '/menu.php';
                 echo '
                     <tr>
                         <td>' . $row['id'] . '</td>
-                        <td><a href="#" class="text-primary h4" onclick="getActivity(' . $row['id'] . ')">' . $row['act_title'] . '</a>';
+                        <td><a href="#" class="text-primary" onclick="getActivity(' . $row['id'] . ')">' . $row['act_title'] . '</a>';
                 echo        '<td>' . $row['act_date'] . '</td>
                         <td>
                             <button onclick="getActivity(' . $row['id'] . ')" type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModal">

@@ -9,9 +9,19 @@ if (!islogin()) {
 }
 if ($_POST) {
     $member_id = $con->real_escape_string($_POST['member_id']);
-    $sql = "SELECT member.*, date_format(join_trade_union_date, '%d/%m/%Y') AS jtd, date_format(join_party_date, '%d/%m/%Y') AS jpd,date_format(join_women_union_date, '%d/%m/%Y') AS jwd, col_name, group_name FROM member JOIN groups ON member.group_id = groups.id JOIN college ON groups.col_id = college.col_id WHERE mem_id = ? ";
+    $sql = "SELECT member.*, 
+            date_format(join_trade_union_date, '%d/%m/%Y') AS jtd,
+            date_format(join_party_date, '%d/%m/%Y') AS jpd,
+            date_format(join_women_union_date, '%d/%m/%Y') AS jwd, 
+            col_name, 
+            group_name 
+            FROM member 
+            JOIN groups ON member.group_id = groups.id 
+            JOIN college ON member.col_id = college.col_id 
+            WHERE member.mem_id = ? ";
     $rs = prepared_stm($con, $sql, [$member_id])->get_result();
-    if (mysqli_num_rows($rs) == 0) {
+    // print_r($rs);
+    if ($rs->num_rows == 0) {
         echo '<div class="alert alert-warning">
         ກະລຸນາສ້າງຈຸ ແລະ ກຳນົດຈຸໃຫ້ຖືກຕ້ອງ
         <br><br>
@@ -64,8 +74,8 @@ if ($_POST) {
             <div class="col-6" style="border-right: solid grey thin;">
                 <h4>ຂໍ້ມູນສ່ວນໂຕ</h4>
                 <div class="row">
-                    <div class="col-3"><p class="text-secondary">ບ້ານເກີດທີ່:</p></div>
-                    <div class="col-9">
+                    <div class="col-4"><p class="text-secondary">ບ້ານເກີດທີ່:</p></div>
+                    <div class="col-8">
                     <p>
                     ບ້ານ ' . $row['h_village'] . '<br>
                     ເມືອງ ' . $row['h_district'] . '<br>
@@ -75,8 +85,8 @@ if ($_POST) {
                 </div>
 
                 <div class="row">
-                    <div class="col-3"><p class="text-secondary">ປະຈຸບັນຢູ່ທີ່:</p></div>
-                    <div class="col-9">
+                    <div class="col-4"><p class="text-secondary">ປະຈຸບັນຢູ່ທີ່:</p></div>
+                    <div class="col-8">
                     <p>
                     ບ້ານ ' . $row['addr_village'] . '<br>
                     ເມືອງ ' . $row['addr_district'] . '<br>
@@ -89,21 +99,21 @@ if ($_POST) {
             <div class="col-6">
                 <h4>ຂໍ້ມູນອື່ນໆ</h4>
                 <div class="row">
-                    <div class="col-3"><p class="text-secondary">ວັນທີເຂົ້າພັກ:</p></div>
-                    <div class="col-9">
+                    <div class="col-4"><p class="text-secondary">ວັນທີເຂົ້າພັກ:</p></div>
+                    <div class="col-8">
                     <p >' . $jpd . '</p>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-3"><p class="text-secondary">ວັນທີເຂົ້າແມ່ຍິງ:</p></div>
-                    <div class="col-9">
+                    <div class="col-4"><p class="text-secondary">ວັນທີເຂົ້າແມ່ຍິງ:</p></div>
+                    <div class="col-8">
                     <p >' . $jwd . '</p>
                     </div>
                 </div>
                 
                 <div class="row">
-                    <div class="col-3"><p class="text-secondary">ເລກທີປຶ້ມ:</p></div>
-                    <div class="col-9">
+                    <div class="col-4"><p class="text-secondary">ເລກທີປຶ້ມ:</p></div>
+                    <div class="col-8">
                     <p>' . $row['book_no'] . '</p>
                     </div>
                 </div>
@@ -138,7 +148,7 @@ if ($_POST) {
             $row = $rs->fetch_assoc();
             $str .= '
         <p>
-                    <span class="text-secondary"><i class="fa-solid fa-circle-arrow-left text-danger fa-lg"></i> &nbsp; ຍ້າຍອອກ: </span>
+                    <span class="text-secondary"><i class="fa-solid fa-circle-arrow-left text-danger fa-2x"></i> &nbsp; ຍ້າຍອອກ: </span>
                     <b>ວັນທີ ' . $row['i_date'] . '</b> &nbsp;
                     (ເລກທີ ' . $row['doc_no'] . ')
                 </p>';

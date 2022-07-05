@@ -15,6 +15,8 @@ if($_POST){
     $sql = "DELETE FROM member_out WHERE id = ?";
     $rs = prepared_stm($con, $sql, [$_POST['id']], 'i');
 
-    $sql = "UPDATE member SET member.status = 1 WHERE member.id = ?";
-    $rs = prepared_stm($con, $sql, [$_POST['id']], 'i');
+    $sql = "UPDATE member SET member.status = 1 WHERE member.mem_id = ?";
+    $rs = prepared_stm($con, $sql, [$_POST['mem_id']], 'i');
+
+    echo $con->error;
 }

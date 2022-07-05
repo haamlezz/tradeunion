@@ -73,7 +73,7 @@
             <li><a class="dropdown-item" href="rpt_all.php?page=member">ລາຍງານຂໍ້ມູນສະມາຊິກແຕ່ລະຮາກຖານ</a></li>
             <li><a class="dropdown-item" href="rpt_all.php?page=fee">ລາຍງານຂໍ້ມູນການເສຍຄ່າສະຕິຂອງແຕ່ລະຮາກຖານ</a></li>
             <li><a class="dropdown-item" href="rpt_all.php?page=in">ລາຍງານຂໍ້ມູນຍ້າຍເຂົ້າຂອງແຕ່ລະຮາກຖານ</a></li>
-            <li><a class="dropdown-item" href="rpt_all.php?page=out">ລາຍງານຂໍ້ມູນຍ້າຍອອກຂອງແຕ່ລະຮາຖານ</a></li>
+            <li><a class="dropdown-item" href="rpt_all.php?page=out">ລາຍງານຂໍ້ມູນຍ້າຍອອກຂອງແຕ່ລະຮາກຖານ</a></li>
             <li><a class="dropdown-item" href="rpt_all.php?page=activity">ລາຍງານຂໍ້ມູນການເຄື່ອນໄຫວຂອງແຕ່ລະຮາກຖານ</a></li>
             <?php endif;?>
           </ul>

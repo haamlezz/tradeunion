@@ -23,6 +23,21 @@ if(!islogin()){header('Location:login.php');}
     <title>ລະບົບຈັດການຂໍ້ມູນສະມາຊິກກຳມະບານ ສກອ</title>
 </head>
 <body style="height: 100%;">
+<?php
+$username = $_SESSION['username'];
+if($_GET){
+    $username = $con->real_escape_string($_GET['username']);
+}
+$sql = "SELECT * FROM college WHERE col_id = ". $_SESSION['college_id'] ;
+$rs = mysqli_query($con, $sql);
+if(!$rs){
+    echo '<div class="mt-3 text-center">';
+    echo '<b><a href="logout.php">ກັບຄືນ</a></b>';
+    echo '</div>';
+    echo '</body></html>';
+    exit;
+}
+?>
 <div class="container mt-3"  style="height: 100%;">
     <div class="row">
         <div class="col-3 text-center">
@@ -33,12 +48,7 @@ if(!islogin()){header('Location:login.php');}
                 ພາກເອກະຊົນ
             </h6>
             <?php
-                $username = $_SESSION['username'];
-                if($_GET){
-                    $username = $con->real_escape_string($_GET['username']);
-                }
-                $sql = "SELECT * FROM college WHERE col_id = ". $_SESSION['college_id'] ;
-                $rs = mysqli_query($con, $sql);
+                
                 $row = mysqli_fetch_assoc($rs);
                 echo '<p class="text-center mt-3 mb-5">
                     <b>'.$row['col_name'].'</b><br>
@@ -64,7 +74,9 @@ if(!islogin()){header('Location:login.php');}
         </div>
         <div class="col-8 offset-1">
             <?php
-                $sql = "SELECT member.mem_id, 
+
+                $sql = "
+                        SELECT member.mem_id, 
                         CONCAT(member.firstname,' ',member.lastname) AS fullname ,
                         member.gender,
                         (SELECT groups.group_name FROM groups WHERE groups.id = member.group_id) AS group_name,
@@ -74,14 +86,21 @@ if(!islogin()){header('Location:login.php');}
                         DATE_FORMAT(member.join_women_union_date, '%d/%m/%Y') AS j_w,
                         (SELECT DATE_FORMAT(member_in.issue_date,'%d/%m/%Y') FROM member_in WHERE member_in.mem_id = member.mem_id) AS in_date,
                         (SELECT DATE_FORMAT(member_out.issue_date,'%d/%m/%Y') FROM member_out WHERE member_out.mem_id = member.mem_id) AS out_date,
-                        (SELECT college.col_name FROM college WHERE college.col_id = member.col_id) AS col_name
+                        (SELECT college.col_name FROM college WHERE college.col_id = groups.col_id) AS col_name
                         FROM member 
-                        WHERE username = '" .$username."'";
-
+                        JOIN groups ON groups.id = member.group_id 
+                        WHERE username = '" .$username.
+                        "'";
+                
                 $rs = mysqli_query($con, $sql);
-                echo mysqli_error($con);
+                if($rs->num_rows == 0){
+                    echo '<div class="mt-4 alert alert-danger text-center">ບັນຊີນີ້ຍັງບໍ່ທັນໄດ້ຮັບການອານຸມັດໃຊ້ງານ</div>';
+                    require __DIR__.'/footer.php';
+                    exit;
+                }
                 $row = mysqli_fetch_assoc($rs);
                 $mem_id = $row['mem_id'];
+                
             ?>
             <br>
             <small class="text-secondary">ຊື່ ນາມສະກຸນ</small>
@@ -123,7 +142,13 @@ if(!islogin()){header('Location:login.php');}
             
             <h5  class="mt-5">ການຊຳລະຄ່າສະຕິ</h5>
             <?php
-                $sql = "SELECT DATE_FORMAT(membership_fee.pay_date,'%d/%m/%Y') AS pd, yearly_fee.fee FROM membership_fee JOIN yearly_fee ON membership_fee.fee_id = yearly_fee.id WHERE mem_id = $mem_id";
+                $sql = "SELECT 
+                DATE_FORMAT(membership_fee.pay_date,'%d/%m/%Y') AS pd, 
+                yearly_fee.fee 
+                FROM membership_fee 
+                JOIN yearly_fee ON membership_fee.fee_id = yearly_fee.id 
+                WHERE mem_id = $mem_id";
+
                 $rs = mysqli_query($con, $sql);
                 
                 if(mysqli_num_rows($rs)==0){

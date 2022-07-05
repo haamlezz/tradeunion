@@ -12,13 +12,23 @@ if ($_POST) {
 
     $password = $_POST['password'];
 
-    $sql = "SELECT username, member.role, group_id, member.password, member.status, member.col_id FROM member WHERE username = '$username'";
+    $sql = "SELECT 
+            username, 
+            member.role, 
+            group_id, 
+            member.password, 
+            member.status, 
+            member.col_id,
+            member.mem_id
+            FROM member 
+            WHERE username = '$username'";
     
     $rs = $con->query($sql);
+    print_r($con->error);
     
     if ($rs->num_rows == 0) {
         $_SESSION['error_msg'] = '<div class="alert alert-danger">ຊື່ບັນຊີ ຫຼື ລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ, ກະລຸນາລອງໃໝ່ອີກຄັ້ງ</div>';
-        header('Location:login.php');
+        // header('Location:login.php');
     } else {
         unset($_SESSION['login_attemp']);
         $row = $rs->fetch_assoc();
@@ -32,6 +42,7 @@ if ($_POST) {
                 $_SESSION['login'] = true;
                 $_SESSION['username'] = $username;
                 $_SESSION['role'] = $row['role'];
+                $_SESSION['member_id'] = $row['mem_id'];
 
                 //KEY ENCRYPT
                 $_SESSION['ciphering']='AES-128-CTR';

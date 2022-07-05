@@ -9,14 +9,13 @@ if (!islogin()) {
     header('Location:login.php');
 }
 
-if (!isAdmin() && !isCommittee() && !$_GET) {
+if (isMember() && !$_GET) {
     restrictPage();
 }
 
 if($_GET && !isAdmin() && !isCommittee()){
     restrictPage();
 }
-
 
 
 require __DIR__ . '/menu.php';
@@ -101,10 +100,6 @@ if ($_GET && isset($_GET['activity_id'])) {
     }
 
 
-    if(!isOwner($_GET['activity_id'])){
-        restrictPage();
-    }
-
     $sql = "SELECT * FROM activity WHERE id = ? AND col_id = ?";
         $rs = prepared_stm($con, $sql, [$_GET['activity_id'], $_SESSION['college_id']])->get_result();
         $row = $rs->fetch_assoc();
@@ -114,6 +109,8 @@ if ($_GET && isset($_GET['activity_id'])) {
         $act_date  = $row['act_date'];
         $act_detail     = $row['act_detail'];
         $total_member_join    = $row['total_member_join'];
+        
+        if(!isOwner($row['col_id']))restrictPage();
 }
 
 echo @$message;

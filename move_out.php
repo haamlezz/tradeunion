@@ -57,7 +57,7 @@ require_once __DIR__ . '/menu.php';
                 if ($_SESSION['college_id'] == $row['col_id']) {
                     echo '                
                             <a href="move_out_add.php?id=' . $row['id'] . '" class="btn btn-success btn-sm">ແກ້ໄຂ</a>
-                            <a onclick="deleteMoveOut(' . $row['id'] . ')" href="#" class="btn btn-danger btn-sm">ລົບ</a>
+                            <a onclick="deleteMoveOut(' . $row['id'] . ', '.$row['mem_id'].')" href="#" class="btn btn-danger btn-sm">ລົບ</a>
                     ';
                 }
 
@@ -88,7 +88,7 @@ require __DIR__ . '/footer.php';
         // });
     });
 
-    function deleteMoveOut(id) {
+    function deleteMoveOut(id,mem_id) {
 
         Swal.fire({
             title: "ຕ້ອງການລືບແທ້ ຫຼື ບໍ່?",
@@ -106,14 +106,14 @@ require __DIR__ . '/footer.php';
                     url: "move_out_delete.php",
                     method: "post",
                     data: {
-                        id: id
+                        id:id, mem_id:mem_id
                     },
                     success: function(data) {
                         console.log(data)
                         Swal.fire("ສໍາເລັດ", "ຂໍ້ມູນຖືກລືບອອກຈາກຖານຂໍ້ມູນແລ້ວ", "success", {
                             button: "ຕົກລົງ",
                         }).then(() => {
-                            location.reload();
+                            location.reload();  
                         });
                     }
                 });

@@ -34,7 +34,12 @@ require_once __DIR__ . '/menu.php';
         </thead>
         <tbody>
             <?php
-            $sql = "SELECT member_in.*, CONCAT(member.firstname, ' ', member.lastname) AS fullname, date_format(issue_date, '%d/%m/%Y') AS i_date FROM member_in JOIN member ON member.mem_id = member_in.mem_id WHERE member_in.col_id = " . $_SESSION['college_id'];
+            $sql = "SELECT member_in.*, 
+                    CONCAT(member.firstname, ' ', member.lastname) AS fullname, 
+                    date_format(issue_date, '%d/%m/%Y') AS i_date 
+                    FROM member_in 
+                    JOIN member ON member.mem_id = member_in.mem_id 
+                    WHERE member_in.col_id = " . $_SESSION['college_id'];
             $rs = $con->query($sql);
             echo $con->error;
             while ($row = $rs->fetch_assoc()) {
