@@ -221,7 +221,7 @@ function getReportQuery($page, $otherQuery=null){
             if($otherQuery != null){
                 $sql .= $otherQuery;
             }else{
-                $sql .= " AND (yearly_fee.year = ". date('Y') ." AND member.status <> 2 )";
+                $sql .= " AND (yearly_fee.year <= ". date('Y') ." AND member.status <> 2 )";
             }
             $sql .= " ORDER BY member.role ASC ";
         break;
@@ -242,7 +242,7 @@ function getReportQuery($page, $otherQuery=null){
                 $sql .= $otherQuery;
             }else{
                 $sql .= " 
-                AND YEAR(member_in.issue_date) = ".date('Y')." ";
+                AND YEAR(member_in.issue_date) <= ".date('Y')." ";
             }
 
         break;
@@ -264,7 +264,7 @@ function getReportQuery($page, $otherQuery=null){
                 $sql .= $otherQuery;
             }else{
                 $sql .= " 
-                AND YEAR(member_out.issue_date) = ".date('Y')."
+                AND YEAR(member_out.issue_date) <= ".date('Y')."
                 ;";
             }
         break;
@@ -279,7 +279,7 @@ function getReportQuery($page, $otherQuery=null){
                 $sql .= $otherQuery;
             }else{
                 $sql .= "
-                    AND YEAR(act_date) = ".date('Y')."
+                    AND YEAR(act_date) <= ".date('Y')."
                     ";
             }
         break;
@@ -306,13 +306,13 @@ function getReportAllQuery($page, $otherQuery=null){
         break;
         case 'member': $sql = "
             SELECT
-            (SELECT college.col_name FROM college WHERE college.col_id = groups.col_id) AS col_name,
+            (SELECT college.col_name FROM college WHERE college.col_id = member.col_id) AS col_name,
             COUNT(mem_id) AS all_member,
             COUNT(CASE WHEN gender = 'ຍິງ' THEN 1 END) AS female,
             COUNT(CASE WHEN role = 3 THEN 1 END) AS student,
             COUNT(CASE WHEN role = 3 AND gender = 'ຍິງ' THEN 1 END) AS student_female
             FROM member 
-            JOIN groups ON groups.id = member.group_id
+            JOIN college ON college.col_id = member.col_id
             ";
 
             if($otherQuery != null){
@@ -324,8 +324,8 @@ function getReportAllQuery($page, $otherQuery=null){
             }
 
             $sql .= "
-                GROUP BY groups.col_id
-                ORDER BY groups.col_id;
+                GROUP BY college.col_id
+                ORDER BY college.col_id;
             ";
         break;
         case 'fee': $sql = "

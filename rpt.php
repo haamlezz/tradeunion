@@ -84,7 +84,8 @@ $page = $_GET['page'];
         }
         echo '</select></div>
             <input type="hidden" name="page" value="member"/>
-            <div class="col-2"><input type="submit" value="ສະແດງຜົນ" class="btn btn-outline-success"></div>
+            <div class="col-1"><input type="submit" value="ສະແດງຜົນ" class="btn btn-outline-success"></div>
+            <div class="col-1"><a href="rpt.php?page=member" class="btn btn-outline-danger">ລ້າງຄ່າ</a></div>
         </div></form>';
         $year = null ;
         $rs = mysqli_query($con, getReportQuery($page));
@@ -155,7 +156,8 @@ $page = $_GET['page'];
         }
         echo '</select></div>
             <input type="hidden" name="page" value="'.$page.'"/>
-            <div class="col-2"><input type="submit" value="ສະແດງຜົນ" class="btn btn-outline-success"></div>
+            <div class="col-1"><input type="submit" value="ສະແດງຜົນ" class="btn btn-outline-success"></div>
+            <div class="col-1"><a href="rpt.php?page=fee" class="btn btn-outline-danger">ລ້າງຄ່າ</a></div>
         </div></form>';
         $year = null ;
         $rs = mysqli_query($con, getReportQuery($page));
@@ -301,7 +303,8 @@ $page = $_GET['page'];
         }
         echo '</select></div>
             <input type="hidden" name="page" value="'.$page.'"/>
-            <div class="col-2"><input type="submit" value="ສະແດງຜົນ" class="btn btn-outline-success"></div>
+            <div class="col-1"><input type="submit" value="ສະແດງຜົນ" class="btn btn-outline-success"></div>
+            <div class="col-1"><a href="rpt.php?page=in" class="btn btn-outline-danger">ລ້າງຄ່າ</a></div>
         </div></form>';
         $year = null ;
         $rs = mysqli_query($con, getReportQuery($page));
@@ -372,7 +375,8 @@ $page = $_GET['page'];
         }
         echo '</select></div>
             <input type="hidden" name="page" value="'.$page.'"/>
-            <div class="col-2"><input type="submit" value="ສະແດງຜົນ" class="btn btn-outline-success"></div>
+            <div class="col-1"><input type="submit" value="ສະແດງຜົນ" class="btn btn-outline-success"></div>
+            <div class="col-1"><a href="rpt.php?page=out" class="btn btn-outline-danger">ລ້າງຄ່າ</a></div>
         </div></form>';
         $year = null ;
         $rs = mysqli_query($con, getReportQuery($page));
@@ -452,7 +456,8 @@ $page = $_GET['page'];
                 </select>
             </div>
             <input type="hidden" name="page" value="'.$page.'"/>
-            <div class="col-2"><input type="submit" value="ສະແດງຜົນ" class="btn btn-outline-success"></div>
+            <div class="col-1"><input type="submit" value="ສະແດງຜົນ" class="btn btn-outline-success"></div>
+            <div class="col-1"><a href="rpt.php?page=activity" class="btn btn-outline-danger">ລ້າງຄ່າ</a></div>
         </div></form>';
         $year = null ;
         $quarter = null;

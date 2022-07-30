@@ -155,7 +155,21 @@ if ($_POST) {
                         window.location.href = "login.php";
                     });
             </script>';
-        } else {
+        } else if ($con->errno == 1062){
+            $message = '<script type="text/javascript">
+            Swal.fire({
+                title: "ຂໍ້ມູນຜູ້ໃຊ້ຊໍ້າກັນ",
+                position: "top-center",
+                icon: "warning",
+                text: "ປ່ຽນຂໍ້ມູນຜູ້ໃຊ້ໃໝ່",
+                button: "ລອງໃໝ່",
+            }).then(() => {
+                //location.reload();
+            });
+            </script>';
+            $isValid['username'] = 'is-invalid';
+        
+         } else {
             $message = '<script type="text/javascript">
             Swal.fire({
                 title: "ບໍ່ສຳເລັດ",
@@ -201,7 +215,7 @@ echo @$message;
                     <div class="col-md-6">
                         <div class="form-group mb-2">
                             <label for="username">ຊື່ບັນຊີຜູ້ໃຊ້</label>
-                            <input required value="<?= @$username ?>" id="username" type="text" class="form-control <?= @$isValid['username'] ?>" name="username" placeholder="ປ້ອນຊື່ບັນຊີຜູ້ໃຊ້">
+                            <input onkeyup="checkUser(this.value)" required value="<?= @$username ?>" id="username" type="text" class="form-control <?= @$isValid['username'] ?>" name="username" placeholder="ປ້ອນຊື່ບັນຊີຜູ້ໃຊ້">
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -403,7 +417,38 @@ require __DIR__ . '/footer.php';
 ?>
 
 <script>
-function checkUserName(){
-    
-}
+
+$('#username').keypress(function(ew) {
+        var ew = event.which;
+        if (ew == 32) {
+            return true;
+        }
+        if (48 <= ew && ew <= 57)
+            return true;
+        if (65 <= ew && ew <= 90)
+            return true;
+        if (97 <= ew && ew <= 122)
+            return true;
+        return false;
+    });
+
+    function checkUser(value){
+        console.log(value);
+        $.ajax({
+            url: "checkUser.php",
+            method: "post",
+            data: {
+                username: value,
+            },
+            success: function(data) {
+                console.log(data);
+                if(data == 1){
+                    document.getElementById('username').setAttribute('class','form-control is-invalid');
+                }else{
+                    document.getElementById('username').setAttribute('class','form-control');
+                }
+                
+            }
+        });
+    }
 </script>

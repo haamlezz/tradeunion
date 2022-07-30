@@ -24,16 +24,14 @@ if ($_POST) {
             WHERE username = '$username'";
     
     $rs = $con->query($sql);
-    print_r($con->error);
+    // echo $con->error;
     
     if ($rs->num_rows == 0) {
         $_SESSION['error_msg'] = '<div class="alert alert-danger">ຊື່ບັນຊີ ຫຼື ລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ, ກະລຸນາລອງໃໝ່ອີກຄັ້ງ</div>';
-        // header('Location:login.php');
+        header('Location:login.php');
     } else {
         unset($_SESSION['login_attemp']);
         $row = $rs->fetch_assoc();
-
-
         if ($row['status'] == 0) {
             header('Location:not_active.php');
         } else {

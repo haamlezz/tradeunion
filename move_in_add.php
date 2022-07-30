@@ -36,6 +36,8 @@ if ($_POST) {
     $member = $con->real_escape_string($_POST['member']);
     $doc_no = $con->real_escape_string($_POST['doc_no']);
     $issue_date = $con->real_escape_string($_POST['issue_date']);
+    $previous_college = $con->real_escape_string($_POST['previous_college']);
+    $latest_paid_year = $con->real_escape_string($_POST['latest_paid_year']);
 
     $member_r = explode(" ", $member);
 
@@ -64,9 +66,9 @@ if ($_POST) {
 
             switch ($_POST['do']) {
                 case 'add':
-                    $sql = "INSERT INTO member_in (col_id, mem_id, doc_no, issue_date) VALUES(?,?,?,?)";
+                    $sql = "INSERT INTO member_in (col_id, mem_id, doc_no, issue_date, previous_college, latest_paid_year) VALUES(?,?,?,?,?,?)";
 
-                    $rs = prepared_stm($con, $sql, [$_SESSION['college_id'], $mem_id, $doc_no, $issue_date]);
+                    $rs = prepared_stm($con, $sql, [$_SESSION['college_id'], $mem_id, $doc_no, $issue_date, $previous_college, $latest_paid_year]);
 
                     if ($rs->affected_rows == 1) {
                         $message = '<script type="text/javascript">
@@ -84,12 +86,10 @@ if ($_POST) {
                     break;
 
                 case 'edit':
-                    $sql = "UPDATE member_in SET doc_no=?, issue_date=?, mem_id=? WHERE id=?";
-                    $rs = prepared_stm($con, $sql, [$doc_no, $issue_date, $mem_id, $_POST['id']]);
-    
+                    $sql = "UPDATE member_in SET doc_no=?, issue_date=?, mem_id=?, previous_college=?, latest_paid_year=? WHERE id=?";
+                    $rs = prepared_stm($con, $sql, [$doc_no, $issue_date, $mem_id, $previous_college, $latest_paid_year, $_POST['id']]);
+                    
                     if ($rs->affected_rows == 1) {
-                        
-
                         $message = '<script type="text/javascript">
                             Swal.fire({
                                         title:"ສຳເລັດ",
@@ -110,7 +110,7 @@ if ($_POST) {
                                 text: "ມີບາງຢ່າງຜິດພາດ",
                                 button: "ລອງໃໝ່",
                             }).then((data)=>{
-                                window.location.href = "move_in.php";
+                                // window.location.href = "move_in.php";
                             });
                             </script>';
                     }
@@ -131,6 +131,8 @@ if ($_GET && isset($_GET['id'])) {
     $member = $row['fullname'];
     $doc_no = $row['doc_no'];
     $issue_date = $row['issue_date'];
+    $previous_college = $row['previous_college'];
+    $latest_paid_year = $row['latest_paid_year'];
 }
 
 echo @$message;
@@ -167,11 +169,26 @@ echo @$message;
             </div>
 
         </div>
+
+        <div class="row mt-3">
+            <div class="col-6">
+                <div class="form-group">
+                    <label for="previous_college">ຮາກຖານກ່ອນໜ້າ</label>
+                    <input value="<?= @$previous_college ?>" required type="text" name="previous_college" id="previous_college" class="form-control" placeholder="ປ້ອນຮາກຖານກ່ອນໜ້າ">
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group">
+                    <label for="latest_paid_year">ປີສຸດທ້າຍທີ່ເສຍຄ່າສະຕິ</label>
+                    <input value="<?= @$latest_paid_year ?>" required type="text" name="latest_paid_year" id="latest_paid_year" class="form-control" placeholder="ປ້ອນປີສຸດທ້າຍທີ່ເສຍຄ່າສະຕິ">
+                </div>
+            </div>
+        </div>
         <?php
         if (isset($_GET['id'])) {
             echo '<input type="hidden" name="id" value="' . $_GET['id'] . '">';
             echo '<button name="do" value="edit" class="btn col-2 btn-primary mt-3">ບັນທຶກການປ່ຽນແປງ</button> &nbsp;';
-            echo '<a href="activity.php" class="btn col-1 btn-warning mt-3">ຍົກເລີກ</a>';
+            echo '<a href="move_in.php" class="btn col-1 btn-warning mt-3">ຍົກເລີກ</a>';
         } else {
             echo '<button name="do" value="add" class="btn col-2 btn-primary mt-3">ບັນທຶກ</button>';
         }

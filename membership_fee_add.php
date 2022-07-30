@@ -135,7 +135,7 @@ if ($_POST) {
                     <select name="group_id" id="group_id" class="form-control">
                         <option value="*">ສະແດງທັງໝົດ</option>
                         <?php
-                        $sql = "SELECT * from groups WHERE col_id = " . $_SESSION['college_id'];
+                        $sql = "SELECT * from groups WHERE col_id = " . $_SESSION['college_id'] . " ORDER BY group_name";
                         $rs = mysqli_query($con, $sql);
                         while ($row = mysqli_fetch_assoc($rs)) {
                             echo '

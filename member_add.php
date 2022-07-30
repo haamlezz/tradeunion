@@ -20,36 +20,36 @@ $error = '';
 /**
  * Add College
  */
-$isValid=[];
-$i=0;
-    $firstname   = 
-    $lastname    = 
-    $gender      = 
-    $username  = 
-    $password     = 
-    $hash_password = 
-    $ethnic     = 
+$isValid = [];
+$i = 0;
+$firstname   =
+    $lastname    =
+    $gender      =
+    $username  =
+    $password     =
+    $hash_password =
+    $ethnic     =
     $dob = $day = $month = $year =
-    $h_village = 
-    $h_district = 
-    $h_province = 
-    $addr_village = 
-    $addr_district = 
-    $addr_province = 
-    $book_no = 
-    $join_trade_union_date = 
-    $join_party_date = 
-    $join_local = 
+    $h_village =
+    $h_district =
+    $h_province =
+    $addr_village =
+    $addr_district =
+    $addr_province =
+    $book_no =
+    $join_trade_union_date =
+    $join_party_date =
+    $join_local =
     $join_women_union_date = $group_id = NULL;
-    $role = 3;
-    $status = 1;
-    $col_id = $_SESSION['college_id'];
+$role = 3;
+$status = 1;
+$col_id = $_SESSION['college_id'];
 if ($_POST) {
-    foreach ($_POST as $p=>$v) {
-        if($p == 'password' && $_POST['do']=='edit'){
+    foreach ($_POST as $p => $v) {
+        if ($p == 'password' && $_POST['do'] == 'edit') {
             break;
         }
-        if(noValidateField($p, ['join_women_union_date', 'join_party_date', 'group_id', 'book_no', 'join_local'])){
+        if (noValidateField($p, ['join_women_union_date', 'join_party_date', 'group_id', 'book_no', 'join_local'])) {
             break;
         }
         if (ctype_space($v) || empty($v)) {
@@ -59,7 +59,7 @@ if ($_POST) {
         }
     }
 
-    
+
 
     $firstname   = $con->real_escape_string($_POST['firstname']);
     $lastname    = $con->real_escape_string($_POST['lastname']);
@@ -81,26 +81,26 @@ if ($_POST) {
     $book_no = $con->real_escape_string($_POST['book_no']);
     $join_trade_union_date = $con->real_escape_string($_POST['join_trade_union_date']);
     $group_id = $con->real_escape_string($_POST['group_id']);
+    $status = $con->real_escape_string($_POST['status']);
 
-    if(!$_POST['join_party_date']==''){
+    if (!$_POST['join_party_date'] == '') {
         $join_party_date = $con->real_escape_string($_POST['join_party_date']);
     }
 
-    if(!$_POST['join_women_union_date']==''){
+    if (!$_POST['join_women_union_date'] == '') {
         $join_women_union_date = $con->real_escape_string($_POST['join_women_union_date']);
     }
 
-    if(!$_POST['join_local'] == ''){
+    if (!$_POST['join_local'] == '') {
         $join_local = $con->real_escape_string($_POST['join_local']);
     }
 
-    if($_SESSION['role']==1){
+    if ($_SESSION['role'] == 1) {
         $role = $con->real_escape_string($_POST['role']);
-        $status = $con->real_escape_string($_POST['status']);
         $col_id = $con->real_escape_string($_POST['col_id']);
     }
-    
-    
+
+
     if ($_POST['do'] == 'add' && $error == '') {
         $data = [
             $username,
@@ -127,9 +127,9 @@ if ($_POST) {
             $col_id
         ];
 
-        
 
-        
+
+
 
         $sql = "INSERT INTO member(
             username,
@@ -157,8 +157,8 @@ if ($_POST) {
         ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
         $rs = prepared_stm($con, $sql, $data);
-        echo $con->error;
-        
+        // echo $con->errno;
+
         if ($rs->affected_rows == 1) {
             $message = '<script type="text/javascript">
             Swal.fire({
@@ -168,9 +168,22 @@ if ($_POST) {
                         text: "ບັນທຶກຂໍ້ມູນສຳເລັດ",
                         button: "ຕົກລົງ",
                     }).then((data)=>{
-                        // window.location.href = "member.php";
+                        window.location.href = "member.php";
                     });
             </script>';
+        } else if ($con->errno == 1062){
+            $message = '<script type="text/javascript">
+            Swal.fire({
+                title: "ຂໍ້ມູນຜູ້ໃຊ້ຊໍ້າກັນ",
+                position: "top-center",
+                icon: "warning",
+                text: "ປ່ຽນຂໍ້ມູນຜູ້ໃຊ້ໃໝ່",
+                button: "ລອງໃໝ່",
+            }).then(() => {
+                //location.reload();
+            });
+            </script>';
+            $isValid['username'] = 'is-invalid';
         } else {
             $message = '<script type="text/javascript">
             Swal.fire({
@@ -185,8 +198,8 @@ if ($_POST) {
             </script>';
         }
     } else if ($_POST['do'] == 'edit' && $error == '') {
-        $mem_id   = $con->real_escape_string($_POST['member_id']); 
-        
+        $mem_id   = $con->real_escape_string($_POST['member_id']);
+
         $data = [
             $username,
             $book_no,
@@ -206,10 +219,10 @@ if ($_POST) {
             $join_women_union_date,
             $group_id,
             $join_local,
+            $status
         ];
-        if($_SESSION['role']==1){
+        if ($_SESSION['role'] == 1) {
             array_push($data, $role);
-            array_push($data, $status);
             array_push($data, $col_id);
         }
         $sql = "UPDATE member SET
@@ -230,27 +243,28 @@ if ($_POST) {
             join_party_date = ?,
             join_women_union_date = ?,
             group_id = ?,
-            join_local=?
+            join_local=?,
+            status=?
             ";
-        if($_SESSION['role']==1){
-            $sql.=" , role=?, status=?, col_id=? ";
+        if ($_SESSION['role'] == 1) {
+            $sql .= " , role=?, col_id=? ";
         }
 
-        if($_POST['password'] != null){
+        if ($_POST['password'] != null) {
             $password = $con->real_escape_string($_POST['password']);
             $hash_password = password_hash($password, PASSWORD_DEFAULT);
             array_push($data, $hash_password);
 
             $sql .= ", password = ? ";
-        }   
+        }
 
 
-        $sql .= " WHERE mem_id = ".$mem_id;
+        $sql .= " WHERE mem_id = " . $mem_id;
 
         $rs = prepared_stm($con, $sql, $data);
-        
+
         echo $con->error;
-        
+
         if ($rs->affected_rows == 1 || $rs->affected_rows == 0) {
             $message = '<script type="text/javascript">
             Swal.fire({
@@ -263,7 +277,7 @@ if ($_POST) {
                         window.location.href = "member.php";
                     });
             </script>';
-        }else if($rs->errno == 1062){
+        } else if ($rs->errno == 1062) {
             $message = '<script type="text/javascript">
             Swal.fire({
                 title: "ຂໍ້ມູນຊໍ້າກັນ",
@@ -275,7 +289,7 @@ if ($_POST) {
                 //location.reload();
             });
             </script>';
-        }else if($rs->affected_row == -1){
+        } else if ($rs->affected_row == -1) {
             $message = '<script type="text/javascript">
             Swal.fire({
                 title: "ບໍ່ສຳເລັດ",
@@ -292,7 +306,7 @@ if ($_POST) {
 }
 
 if ($_GET) {
-    
+
     if (!isExisted($con, 'mem_id', 'member', $_GET['member_id'])) {
         notFoundPage();
     }
@@ -302,38 +316,39 @@ if ($_GET) {
             date_format(dob, '%m') as m, 
             date_format(dob, '%Y') as y  
             FROM member ";
-            
 
-    if(isCommittee()){
-        $sql.= " WHERE mem_id = ? AND member.col_id = ". $_SESSION['college_id'] ;
+
+    if (isCommittee()) {
+        $sql .= " WHERE mem_id = ? AND member.col_id = " . $_SESSION['college_id'];
     }
-    if(isAdmin()){
-        $sql.= " WHERE mem_id = ?";
+    if (isAdmin()) {
+        $sql .= " WHERE mem_id = ?";
     }
     $rs = prepared_stm($con, $sql, [$_GET['member_id']])->get_result();
-    if($rs->num_rows == 1):
-    $row = $rs->fetch_assoc();
-    $firstname   = $row['firstname'];
-    $lastname    = $row['lastname'];
-    $gender      = $row['gender'];
-    $username  = $row['username'];
-    $ethnic     = $row['ethnic'];
-    $dob = $row['dob'];
-    $h_village = $row['h_village'];
-    $h_district = $row['h_district'];
-    $h_province = $row['h_province'];
-    $addr_village = $row['addr_village'];
-    $addr_district = $row['addr_district'];
-    $addr_province = $row['addr_province'];
-    $book_no = $row['book_no'];
-    $join_trade_union_date = $row['join_trade_union_date'];
-    $join_party_date = $row['join_party_date'];
-    $join_women_union_date = $row['join_women_union_date'];
-    $group_id = $row['group_id'];
-    $status = $row['status'];
-    $role = $row['role'];
-    $join_local = $row['join_local']; 
-    
+    if ($rs->num_rows == 1) :
+        $row = $rs->fetch_assoc();
+        $firstname   = $row['firstname'];
+        $lastname    = $row['lastname'];
+        $gender      = $row['gender'];
+        $username  = $row['username'];
+        $ethnic     = $row['ethnic'];
+        $dob = $row['dob'];
+        $h_village = $row['h_village'];
+        $h_district = $row['h_district'];
+        $h_province = $row['h_province'];
+        $addr_village = $row['addr_village'];
+        $addr_district = $row['addr_district'];
+        $addr_province = $row['addr_province'];
+        $book_no = $row['book_no'];
+        $join_trade_union_date = $row['join_trade_union_date'];
+        $join_party_date = $row['join_party_date'];
+        $join_women_union_date = $row['join_women_union_date'];
+        $group_id = $row['group_id'];
+        $status = $row['status'];
+        $role = $row['role'];
+        $join_local = $row['join_local'];
+        $selected_col_id = $row['col_id'];
+
     else :
 
         $message = '<script type="text/javascript">
@@ -347,7 +362,7 @@ if ($_GET) {
                 window.location.href= "member.php";
             });
             </script>';
-            
+
     endif;
 }
 
@@ -380,13 +395,15 @@ echo @$message;
                     <div class="col-6">
                         <div class="form-group mb-2">
                             <label for="username">ຊື່ບັນຊີຜູ້ໃຊ້</label>
-                            <input required value="<?= @$username ?>" id="username" type="text" class="form-control <?= @$isValid['username'] ?>" name="username" placeholder="ປ້ອນຊື່ບັນຊີຜູ້ໃຊ້">
+                            <input onkeyup="checkUser(this.value)" required value="<?= @$username ?>" id="username" type="text" class="form-control <?= @$isValid['username'] ?>" name="username" placeholder="ປ້ອນຊື່ບັນຊີຜູ້ໃຊ້">
                         </div>
                     </div>
                     <div class="col-6">
                         <div class="form-group">
                             <label for="password">ລະຫັດຜ່ານ</label>
-                            <input value="" <?php if(!isset($_GET['member_id'])){echo 'required';} ?> id="password" type="password" class="form-control <?= @$isValid['password'] ?>" name="password" placeholder="ປ້ອນລະຫັດຜ່ານ">
+                            <input value="" <?php if (!isset($_GET['member_id'])) {
+                                                echo 'required';
+                                            } ?> id="password" type="password" class="form-control <?= @$isValid['password'] ?>" name="password" placeholder="ປ້ອນລະຫັດຜ່ານ">
                         </div>
                     </div>
                 </div>
@@ -397,8 +414,8 @@ echo @$message;
                             <label for="gender">ເພດ</label>
                             <select required name="gender" id="gender" class="form-control <?= @$isValid['gender'] ?>">
                                 <option value="">ເລືອກເພດ...</option>
-                                <option value="ຊາຍ" <?= @$gender == 'ຊາຍ'? 'selected':'' ?>>ຊາຍ</option>
-                                <option value="ຍິງ" <?= @$gender == 'ຍິງ'? 'selected':'' ?>>ຍິງ</option>
+                                <option value="ຊາຍ" <?= @$gender == 'ຊາຍ' ? 'selected' : '' ?>>ຊາຍ</option>
+                                <option value="ຍິງ" <?= @$gender == 'ຍິງ' ? 'selected' : '' ?>>ຍິງ</option>
                             </select>
                         </div>
                     </div>
@@ -421,7 +438,7 @@ echo @$message;
 
                                         for ($d = 1; $d <= 31; $d++) {
                                             echo '<option value="' . $d . '"';
-                                            echo $d==@$row['d'] || $d==$day?'selected':'';
+                                            echo $d == @$row['d'] || $d == $day ? 'selected' : '';
                                             echo '>' . $d . '</option>';
                                         }
                                         ?>
@@ -436,7 +453,7 @@ echo @$message;
                                         <?php
                                         for ($m = 1; $m <= 12; $m++) {
                                             echo '<option value="' . $m . '" ';
-                                            echo $m==@$row['m'] || $m==$month ? 'selected':'';
+                                            echo $m == @$row['m'] || $m == $month ? 'selected' : '';
                                             echo '>' . $m . '</option>';
                                         }
                                         ?>
@@ -451,7 +468,7 @@ echo @$message;
                                         <?php
                                         for ($y = 1970; $y <= date("Y"); $y++) {
                                             echo '<option value="' . $y . '" ';
-                                            echo  $y==@$row['y'] || $y==$year ? 'selected':'';
+                                            echo  $y == @$row['y'] || $y == $year ? 'selected' : '';
                                             echo '>' . $y . '</option>';
                                         }
                                         ?>
@@ -518,26 +535,34 @@ echo @$message;
             </div>
             <div class="col-8">
                 <?php
-                    if($_SESSION['role'] == 1):
+                if ($_SESSION['role'] == 1) :
                 ?>
                     <div class="form-group">
                         <label for="col_id">ຮາກຖານ</label>
-                        <select class="form-control" name="col_id" id="col_id" required>
+                        <select class="form-control" name="col_id" id="col_id" required onchange="changeCollege(this.value, <?= $group_id ?>)">
                             <option value="">ເລືອກຮາກຖານ...</option>
                             <?php
-                                $sql_college = "SELECT college.col_id, college.col_name FROM college";
-                                $rs_college = $con->query($sql_college);
-                                while($row_college = $rs_college->fetch_assoc()){
-                                    
+                            $sql_college = "SELECT college.col_id, college.col_name FROM college";
+                            $rs_college = $con->query($sql_college);
+                            if ($_SESSION['colllege_id'] == $col_id) {
+                                while ($row_college = $rs_college->fetch_assoc()) {
                                     echo '
-                                        <option '.($row_college['col_id']==@$col_id?'selected':'').' value="'.$row_college['col_id'].'">'.$row_college['col_name'].'</option>
-                                    ';
+                                            <option ' . ($row_college['col_id'] == @$col_id ? 'selected' : '') . ' value="' . $row_college['col_id'] . '">' . $row_college['col_name'] . '</option>
+                                        ';
                                 }
+                            } else {
+                                while ($row_college = $rs_college->fetch_assoc()) {
+                                    echo '
+                                            <option ' . ($row_college['col_id'] == @$selected_col_id ? 'selected' : '') . ' value="' . $row_college['col_id'] . '">' . $row_college['col_name'] . '</option>
+                                        ';
+                                }
+                            }
+
                             ?>
                         </select>
                     </div>
                 <?php
-                    endif;
+                endif;
                 ?>
                 <div class="row mb-3 mt-3">
                     <div class="col-md-4">
@@ -574,13 +599,22 @@ echo @$message;
                             <select required name="group_id" id="group" class="form-control <?= @$isValid['group'] ?>">
                                 <option value="0">ເລືອກຈຸສັງກັດ</option>
                                 <?php
-                                $sql = "SELECT * FROM groups WHERE col_id = " . $_SESSION['college_id'] ." ORDER BY group_name";
-                                $rs = mysqli_query($con, $sql);
-                                while ($row2 = mysqli_fetch_array($rs)) {
-                                    echo '<option value="' . $row2['id'] . '"';
-                                    echo @$group_id==$row2['id']?'selected':'';
-                                    echo '>' . $row2['group_name'] . '</option>';
+                                $sql = "SELECT * FROM groups WHERE col_id = " . $_SESSION['college_id'] . " ORDER BY group_name";
+                                if ($_GET) {
+                                    if ($_SESSION['college_id'] != $selected_col_id) {
+                                        $sql = "SELECT * FROM groups WHERE col_id = $selected_col_id ORDER BY group_name";
+                                    }
                                 }
+
+                                $rs = mysqli_query($con, $sql);
+                                if (mysqli_num_rows($rs) > 0) {
+                                    while ($row2 = mysqli_fetch_array($rs)) {
+                                        echo '<option value="' . $row2['id'] . '"';
+                                        echo @$group_id == $row2['id'] ? 'selected' : '';
+                                        echo '>' . $row2['group_name'] . '</option>';
+                                    }
+                                }
+
                                 ?>
                             </select>
                         </div>
@@ -594,10 +628,10 @@ echo @$message;
                 </div>
             </div>
         </div>
-        
+
         <hr class="mt-3 mb-3">
-        
-        <?php if(isset($_GET['member_id']) || isAdmin()){?>
+
+        <?php if (isset($_GET['member_id']) || isAdmin()) { ?>
 
             <div class="row">
                 <div class="col-4">
@@ -608,28 +642,28 @@ echo @$message;
                         <label for="status">ສະຖານະ</label>
                         <select required class="form-control" name="status" id="status">
                             <option value="">ເລືອກສະຖານະ...</option>
-                            <option value="0" <?= @$status==0?'selected':''?>>ປິດໃຊ້ງານ</option>
-                            <option value="1" <?= @$status==1?'selected':''?>>ອະນຸມັດໃຊ້ງານ</option>
+                            <option value="0" <?= @$status == 0 ? 'selected' : '' ?>>ປິດໃຊ້ງານ</option>
+                            <option value="1" <?= @$status == 1 ? 'selected' : '' ?>>ອະນຸມັດໃຊ້ງານ</option>
                         </select>
                     </div>
 
-                    <?php if(isAdmin()){?>
-                    <div class="form-group mt-3">
-                        <label for="role">ສິດຖິການເຂົ້າເຖິງ</label>
-                        <select required class="form-control" name="role" id="role">
-                            <option value="">ເລືອກສະຖານະ...</option>
-                            <option value="1" <?= @$role==1?'selected':''?>>ຄະນະບໍລິຫານ</option>
-                            <option value="2" <?= @$role==2?'selected':''?>>ຮາກຖານ</option>
-                            <option value="3" <?= @$role==3?'selected':''?>>ສະມາຊິກທົ່ວໄປ</option>
-                        </select>
-                    </div>
-                    <?php }?>
+                    <?php if (isAdmin()) { ?>
+                        <div class="form-group mt-3">
+                            <label for="role">ສິດຖິການເຂົ້າເຖິງ</label>
+                            <select required class="form-control" name="role" id="role">
+                                <option value="">ເລືອກສະຖານະ...</option>
+                                <option value="1" <?= @$role == 1 ? 'selected' : '' ?>>ຄະນະບໍລິຫານ</option>
+                                <option value="2" <?= @$role == 2 ? 'selected' : '' ?>>ຮາກຖານ</option>
+                                <option value="3" <?= @$role == 3 ? 'selected' : '' ?>>ສະມາຊິກທົ່ວໄປ</option>
+                            </select>
+                        </div>
+                    <?php } ?>
                 </div>
             </div>
 
             <hr class="mt-3 mb-3">
 
-        <?php }?>
+        <?php } ?>
 
         <?php
         if (isset($_GET['member_id'])) {
@@ -650,12 +684,59 @@ require __DIR__ . '/footer.php';
 
 
 <script>
-$('#h_province').autocomplete();
-$('#addr_province').autocomplete();
+    $('#h_province').autocomplete();
+    $('#addr_province').autocomplete();
 
-function checkUserName(){
-    
-}
+    function changeCollege(value, group_id) {
 
+        console.log(value)
+        $.ajax({
+            url: "changeCollege.php",
+            method: "post",
+            data: {
+                col_id: value,
+                group_id: group_id
+            },
+            success: function(data) {
+                console.log(data)
+                document.getElementById('group').innerHTML = data;
 
+            }
+        });
+
+    }
+
+    $('#username').keypress(function(ew) {
+        var ew = event.which;
+        if (ew == 32) {
+            return true;
+        }
+        if (48 <= ew && ew <= 57)
+            return true;
+        if (65 <= ew && ew <= 90)
+            return true;
+        if (97 <= ew && ew <= 122)
+            return true;
+        return false;
+    });
+
+    function checkUser(value){
+        console.log(value);
+        $.ajax({
+            url: "checkUser.php",
+            method: "post",
+            data: {
+                username: value,
+            },
+            success: function(data) {
+                console.log(data);
+                if(data == 1){
+                    document.getElementById('username').setAttribute('class','form-control is-invalid');
+                }else{
+                    document.getElementById('username').setAttribute('class','form-control');
+                }
+                
+            }
+        });
+    }
 </script>

@@ -73,9 +73,7 @@ require_once __DIR__ . '/menu.php';
                     (SELECT groups.group_name FROM groups WHERE groups.id = member.group_id) AS g_name, 
                     (SELECT col_name FROM college WHERE college.col_id = member.col_id) AS c_name,
                     member.status 
-                    FROM member 
-                    WHERE member.role <> 3;
-                    ;
+                    FROM member
                     ";
             }
 
@@ -97,8 +95,10 @@ require_once __DIR__ . '/menu.php';
                     case 2:
                         echo '<span class="badge bg-warning">ຮາກຖານ</span>';
                 }
+                
 
                 if($row['status']==2){echo '<span class="badge bg-info">ຍ້າຍອອກແລ້ວ</span>';}
+                if($row['status']==0){echo '<span class="badge bg-danger">ຍັງບໍ່ທັນອານຸມັດ</span>';}
 
                 if ($_SESSION['role'] == 1) {
                     echo '<br>

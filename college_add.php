@@ -49,7 +49,7 @@ if ($_POST) {
         $sql = "INSERT INTO college(col_name, tel, email, col_village, col_district, col_province) VALUES (?,?,?,?,?,?)";
 
         $rs = prepared_stm($con, $sql, $data, 'ssssss');
-
+        echo $con->error;
         if ($rs->affected_rows == 1) {
             $message = '<script type="text/javascript">
             Swal.fire({

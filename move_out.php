@@ -19,6 +19,7 @@ require_once __DIR__ . '/menu.php';
     <?php if (isAdmin() || isCommittee()) : ?>
         <div class="mt-3" style="margin-bottom: 30px;">
             <a href="move_out_add.php" class="btn btn-primary">ເພີ່ມຂໍ້ມູນຍ້າຍອອກ</a>
+            <a href="move_out_add_batch.php" class="btn btn-info">ຍົກຍ້າຍເປັນຊຸດ</a>
         </div>
     <?php endif; ?>
 
